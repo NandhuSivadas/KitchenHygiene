@@ -1,0 +1,65 @@
+{% extends 'Admin/Header.html' %}
+{% load static %}
+
+{% block page_title %}Hotels{% endblock %}
+
+{% block content %}
+<div class="section-glass">
+    <div class="section-header">
+        <h4 class="section-title">Registered Hotels</h4>
+        <button class="btn btn-primary rounded-pill px-4"><i class="fas fa-plus me-2"></i> Add New</button>
+    </div>
+
+    <div class="custom-table-container">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Hotel Name</th>
+                    <th>Email</th>
+                    <th>Hygiene Status</th>
+                    <th>Verified</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hotel in hotels %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><span style="font-weight: 600; color: var(--dark);">{{ hotel.hotel_name }}</span></td>
+                    <td>{{ hotel.hotel_email }}</td>
+                    <td>
+                        <span
+                            class="status-pill {% if hotel.hygiene_status == 'Clean' %}status-clean{% else %}status-unclean{% endif %}">
+                            {{ hotel.hygiene_status }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if hotel.is_verified %}
+                        <i class="fas fa-check-circle text-success font-size-lg"></i>
+                        {% else %}
+                        <i class="fas fa-times-circle text-muted"></i>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'webadmin:admin_upload_image' hotel.id %}"
+                            class="btn btn-sm btn-outline-primary rounded-pill">
+                            <i class="fas fa-upload me-1"></i> Upload
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-4">
+                        <div class="text-muted">
+                            <i class="fas fa-info-circle fa-2x mb-3"></i>
+                            <p>No hotels found.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

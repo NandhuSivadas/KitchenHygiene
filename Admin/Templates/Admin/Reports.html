@@ -1,0 +1,91 @@
+{% extends 'Admin/Header.html' %}
+{% load static %}
+{% block page_title %}Hygiene Reports{% endblock %}
+
+{% block content %}
+<div class="section-glass">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+        <h4 class="section-title m-0">Kitchen Reports</h4>
+
+        <!-- Filter Controls -->
+        <div class="d-flex gap-2">
+            <a href="{% url 'webadmin:view_reports' %}?status=All"
+                class="btn btn-sm rounded-pill px-3 {% if not current_status or current_status == 'All' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                All
+            </a>
+            <a href="{% url 'webadmin:view_reports' %}?status=Clean"
+                class="btn btn-sm rounded-pill px-3 {% if current_status == 'Clean' %}btn-success{% else %}btn-outline-success{% endif %}">
+                Clean
+            </a>
+            <a href="{% url 'webadmin:view_reports' %}?status=Moderately Clean"
+                class="btn btn-sm rounded-pill px-3 {% if current_status == 'Moderately Clean' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+                Moderate
+            </a>
+            <a href="{% url 'webadmin:view_reports' %}?status=Dirty"
+                class="btn btn-sm rounded-pill px-3 {% if current_status == 'Dirty' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                Dirty
+            </a>
+        </div>
+    </div>
+
+    <!-- Reports Grid -->
+    <div class="row g-4">
+        {% for hotel in hotels %}
+        <div class="col-md-6 col-xl-4">
+            <div class="card border-0 h-100 shadow-sm"
+                style="border-radius: 20px; overflow: hidden; transition: transform 0.3s ease;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div
+                                style="width: 50px; height: 50px; background: linear-gradient(135deg, #e0e7ff, #f3e8ff); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 700; color: var(--primary);">
+                                {{ hotel.hotel_name.0|upper }}
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-0 text-dark">{{ hotel.hotel_name }}</h6>
+                                <small class="text-muted">{{ hotel.hotel_email }}</small>
+                            </div>
+                        </div>
+                        <span
+                            class="status-pill {% if hotel.hygiene_status == 'Clean' %}status-clean{% else %}status-unclean{% endif %}">
+                            {{ hotel.hygiene_status }}
+                        </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted small fw-bold">Address</span>
+                        </div>
+                        <span class="d-block text-dark small" style="line-height: 1.4;">{{ hotel.hotel_address }}</span>
+                    </div>
+
+                    <hr style="opacity: 0.1;">
+
+                    <div class="d-flex gap-2 mt-3">
+                        {% if hotel.certificate_generated %}
+                        <a href="{% url 'webadmin:generate_certificate' hotel.id %}"
+                            class="btn btn-sm btn-outline-success flex-grow-1 rounded-pill fw-bold">
+                            <i class="fas fa-download me-1"></i> Report
+                        </a>
+                        {% else %}
+                        <a href="{% url 'webadmin:admin_upload_image' hotel.id %}"
+                            class="btn btn-sm btn-primary flex-grow-1 rounded-pill fw-bold">
+                            <i class="fas fa-camera me-1"></i> Inspect
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="text-muted opacity-50 mb-3">
+                <i class="fas fa-folder-open fa-3x"></i>
+            </div>
+            <h5>No reports found</h5>
+            <p class="text-muted">Try adjusting the filters.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
