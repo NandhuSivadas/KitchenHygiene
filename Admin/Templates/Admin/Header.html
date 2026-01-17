@@ -575,6 +575,11 @@
                 <i class="fas fa-chart-line"></i>
                 <span>Dashboard</span>
             </a>
+            <a href="{% url 'webadmin:approval_requests' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'approval_requests' %}active{% endif %}">
+                <i class="fas fa-user-check"></i>
+                <span>Approval Requests</span>
+            </a>
             <a href="{% url 'webadmin:view_hotels' %}"
                 class="nav-link {% if request.resolver_match.url_name == 'view_hotels' %}active{% endif %}">
                 <i class="fas fa-images"></i>

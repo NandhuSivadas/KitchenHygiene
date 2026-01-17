@@ -10,6 +10,8 @@ urlpatterns = [
     path('generate_certificate/<int:hotel_id>/', views.generate_certificate, name='generate_certificate'),
     path('reports/', views.view_reports, name='view_reports'),
     path('analyze_frame/', views.analyze_frame, name='analyze_frame'),
+    path('approval_requests/', views.approval_requests, name='approval_requests'),
+    path('update_verification/<int:hotel_id>/<str:action>/', views.update_verification, name='update_verification'),
 
 
 ]

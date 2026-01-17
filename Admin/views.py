@@ -223,3 +223,42 @@ def analyze_frame(request):
         })
     
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+# ── Approval Requests ────────────────────────────────────
+def approval_requests(request):
+    """Display all hotel registrations with pending approval status"""
+    pending_hotels = tbl_hotel.objects.filter(is_verified=0).order_by('-id')
+    all_hotels = tbl_hotel.objects.all().order_by('-id')
+    
+    # Get counts for stats
+    pending_count = tbl_hotel.objects.filter(is_verified=0).count()
+    approved_count = tbl_hotel.objects.filter(is_verified=1).count()
+    rejected_count = tbl_hotel.objects.filter(is_verified=2).count()
+    
+    context = {
+        'pending_hotels': pending_hotels,
+        'all_hotels': all_hotels,
+        'pending_count': pending_count,
+        'approved_count': approved_count,
+        'rejected_count': rejected_count,
+    }
+    
+    return render(request, 'Admin/ApprovalRequests.html', context)
+
+
+def update_verification(request, hotel_id, action):
+    """Approve or reject a hotel registration"""
+    hotel = get_object_or_404(tbl_hotel, id=hotel_id)
+    
+    if action == 'approve':
+        hotel.is_verified = 1
+        hotel.verified_at = datetime.now()
+        hotel.save()
+        messages.success(request, f"✅ {hotel.hotel_name} has been approved! They can now log in to their account.")
+    elif action == 'reject':
+        hotel.is_verified = 2
+        hotel.save()
+        messages.warning(request, f"❌ {hotel.hotel_name} has been rejected. They will not be able to log in.")
+    
+    return redirect('webadmin:approval_requests')
