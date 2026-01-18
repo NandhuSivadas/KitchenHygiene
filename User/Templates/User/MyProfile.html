@@ -1,0 +1,272 @@
+{% extends "User/Header.html" %}
+
+{% block title %}My Profile - RateMyKitchen{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .profile-container {
+        max-width: 900px;
+        margin: 3rem auto;
+        padding: 0 1rem;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .page-title {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--dark), var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+
+    .profile-card {
+        background: white;
+        border-radius: 24px;
+        padding: 0;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(201, 169, 97, 0.1);
+        overflow: hidden;
+    }
+
+    .profile-header-section {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        padding: 3rem 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-header-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        background: white;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        position: relative;
+        z-index: 1;
+    }
+
+    .profile-name {
+        font-size: 2rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .profile-subtitle {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .profile-details {
+        padding: 2.5rem;
+    }
+
+    .detail-row {
+        display: flex;
+        align-items: center;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        background: rgba(201, 169, 97, 0.03);
+        border-radius: 16px;
+        border-left: 4px solid var(--primary);
+        transition: all 0.3s ease;
+    }
+
+    .detail-row:hover {
+        background: rgba(201, 169, 97, 0.08);
+        transform: translateX(5px);
+    }
+
+    .detail-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.25rem;
+        margin-right: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .detail-content {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .detail-label {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 0;
+        min-width: 140px;
+    }
+
+    .detail-label::after {
+        content: ":";
+    }
+
+    .detail-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    .action-buttons {
+        padding: 0 2.5rem 2.5rem;
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border: none;
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(201, 169, 97, 0.3);
+        color: white;
+    }
+
+    .btn-back {
+        background: white;
+        border: 2px solid var(--primary);
+        color: var(--primary);
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-back:hover {
+        background: var(--primary);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="page-header" data-aos="fade-up">
+        <h1 class="page-title">My Profile</h1>
+    </div>
+
+    <div class="profile-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="profile-header-section">
+            <div class="profile-avatar">
+                <i class="fas fa-hotel"></i>
+            </div>
+            <h2 class="profile-name">{{ user.hotel_name }}</h2>
+            <p class="profile-subtitle">Hotel Account</p>
+        </div>
+
+        <div class="profile-details">
+            <div class="detail-row" data-aos="fade-right" data-aos-delay="200">
+                <div class="detail-icon">
+                    <i class="fas fa-hotel"></i>
+                </div>
+                <div class="detail-content">
+                    <div class="detail-label">Hotel Name</div>
+                    <div class="detail-value">{{ user.hotel_name }}</div>
+                </div>
+            </div>
+
+            <div class="detail-row" data-aos="fade-right" data-aos-delay="300">
+                <div class="detail-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="detail-content">
+                    <div class="detail-label">Email Address</div>
+                    <div class="detail-value">{{ user.hotel_email }}</div>
+                </div>
+            </div>
+
+            <div class="detail-row" data-aos="fade-right" data-aos-delay="400">
+                <div class="detail-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="detail-content">
+                    <div class="detail-label">Contact Number</div>
+                    <div class="detail-value">{{ user.hotel_contact }}</div>
+                </div>
+            </div>
+
+            <div class="detail-row" data-aos="fade-right" data-aos-delay="500">
+                <div class="detail-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="detail-content">
+                    <div class="detail-label">Address</div>
+                    <div class="detail-value">{{ user.hotel_address }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="/User/edit-profile/" class="btn-edit">
+                <i class="fas fa-edit"></i> Edit Profile
+            </a>
+            <a href="/User/homepage/" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

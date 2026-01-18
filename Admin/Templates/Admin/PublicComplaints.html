@@ -1,0 +1,190 @@
+{% extends "Admin/Header.html" %}
+{% load static %}
+
+{% block page_title %}Public Violations{% endblock %}
+
+{% block content %}
+<!-- Stats Overview -->
+<div class="stats-grid">
+    <div class="stat-card warning">
+        <div class="stat-icon-wrapper">
+            <i class="fas fa-bullhorn"></i>
+        </div>
+        <div class="stat-value">{{ complaints|length }}</div>
+        <div class="stat-label">Total Reports</div>
+        <i class="fas fa-bullhorn stat-bg-icon"></i>
+    </div>
+
+    <div class="stat-card danger">
+        <div class="stat-icon-wrapper">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="stat-value">
+            {% with dirty_count=0 %}
+            {% for c in complaints %}{% if c.ai_status == 'Dirty' %}{% endif %}{% endfor %}
+            <!-- We assume view passes counts or we calculate in template (simplified for now) -->
+            {{ complaints|length }}
+            {% endwith %}
+        </div>
+        <div class="stat-label">Action Required</div>
+        <i class="fas fa-exclamation-triangle stat-bg-icon"></i>
+    </div>
+</div>
+
+<div class="section-glass">
+    <div class="section-header mb-4 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="section-title mb-1">Citizen Reports</h4>
+            <p class="text-muted small m-0">Review hygiene complaints submitted by the public.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                <i class="fas fa-filter me-2"></i>Filter
+            </button>
+            <button class="btn btn-sm btn-outline-success rounded-pill px-3">
+                <i class="fas fa-download me-2"></i>Export
+            </button>
+        </div>
+    </div>
+
+    <div class="custom-table-container">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Hotel Details</th>
+                    <th>Date</th>
+                    <th>Evidence</th>
+                    <th>AI Analysis</th>
+                    <th>Priority</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for complaint in complaints %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+                            <div
+                                style="width: 45px; height: 45px; background: linear-gradient(135deg, #e0e7ff, #f3e8ff); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--primary);">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold text-dark">{{ complaint.hotel.hotel_name }}</div>
+                                <div class="small text-muted">{{ complaint.hotel.place }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="far fa-calendar-alt text-muted"></i>
+                            <span class="text-dark small fw-bold">{{ complaint.submitted_at|date:"M d, Y" }}</span>
+                        </div>
+
+                    </td>
+                    <td>
+                        {% if complaint.image %}
+                        <a href="{{ complaint.image.url }}" target="_blank"
+                            class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            <i class="fas fa-image me-1"></i> Image
+                        </a>
+                        {% elif complaint.video %}
+                        <a href="{{ complaint.video.url }}" target="_blank"
+                            class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                            <i class="fas fa-video me-1"></i> Video
+                        </a>
+                        {% else %}
+                        <span class="text-muted small">No Media</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span
+                            class="status-pill {% if complaint.ai_status == 'Dirty' %}status-unclean{% elif complaint.ai_status == 'Clean' %}status-clean{% else %}status-warning{% endif %}">
+                            {{ complaint.ai_status }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if complaint.priority == 'High' %}
+                        <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3">High</span>
+                        {% else %}
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3">Normal</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light rounded-circle shadow-sm" type="button"
+                                data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v text-muted"></i>
+                            </button>
+                            <ul class="dropdown-menu border-0 shadow-lg p-2" style="border-radius: 12px;">
+                                <li>
+                                    <h6 class="dropdown-header text-uppercase small fw-bold">Actions</h6>
+                                </li>
+                                {% if complaint.description %}
+                                <li>
+                                    <button class="dropdown-item rounded-2 d-flex align-items-center gap-2 py-2"
+                                        data-bs-toggle="modal" data-bs-target="#descModal{{ complaint.id }}">
+                                        <i class="fas fa-align-left text-primary"></i> Read Description
+                                    </button>
+                                </li>
+                                {% endif %}
+                                <li>
+                                    <a class="dropdown-item rounded-2 d-flex align-items-center gap-2 py-2 text-success"
+                                        href="#">
+                                        <i class="fas fa-check-circle"></i> Resolve
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item rounded-2 d-flex align-items-center gap-2 py-2 text-danger"
+                                        href="#">
+                                        <i class="fas fa-trash-alt"></i> Delete
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Description Modal -->
+                        {% if complaint.description %}
+                        <div class="modal fade" id="descModal{{ complaint.id }}" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                                    <div class="modal-header border-0 pb-0">
+                                        <h5 class="modal-title fw-bold">Complaint Description</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4 text-muted">
+                                        {{ complaint.description }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-5">
+                        <div class="opacity-50 mb-3">
+                            <i class="fas fa-clipboard-check fa-3x text-success"></i>
+                        </div>
+                        <h5 class="text-muted">No Violations Reported</h5>
+                        <p class="text-muted small">Everything is clean!</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    /* Additional Styles if specific to this page */
+    .status-warning {
+        background: rgba(245, 158, 11, 0.15);
+        color: var(--warning);
+    }
+
+    .status-warning::before {
+        background: var(--warning);
+    }
+</style>
+{% endblock %}

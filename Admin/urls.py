@@ -12,6 +12,7 @@ urlpatterns = [
     path('analyze_frame/', views.analyze_frame, name='analyze_frame'),
     path('approval_requests/', views.approval_requests, name='approval_requests'),
     path('update_verification/<int:hotel_id>/<str:action>/', views.update_verification, name='update_verification'),
+    path('public-complaints/', views.view_public_complaints, name='view_public_complaints'),
 
 
 ]

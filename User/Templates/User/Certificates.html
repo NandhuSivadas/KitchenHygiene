@@ -1,0 +1,299 @@
+{% extends "User/Header.html" %}
+
+{% block title %}My Certificates - RateMyKitchen{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding-top: 2rem;
+    }
+
+    .page-title {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--dark), var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+        color: #6C757D;
+        font-size: 1.1rem;
+    }
+
+    .cert-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .cert-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(201, 169, 97, 0.1);
+        transition: all 0.4s ease;
+        position: relative;
+    }
+
+    .cert-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+    }
+
+    .cert-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .cert-card-header {
+        padding: 2rem 2rem 1rem;
+        text-align: center;
+    }
+
+    .cert-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 10px 25px rgba(201, 169, 97, 0.3);
+    }
+
+    .cert-number {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .cert-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 1.5rem;
+    }
+
+    .cert-card-body {
+        padding: 0 2rem 1.5rem;
+    }
+
+    .cert-detail-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .cert-detail-item:last-child {
+        border-bottom: none;
+    }
+
+    .cert-detail-icon {
+        color: var(--primary);
+        font-size: 1.1rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    .cert-detail-text {
+        flex: 1;
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+    }
+
+    .cert-detail-value {
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    .cert-card-footer {
+        padding: 1.5rem 2rem 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        width: 100%;
+    }
+
+    .status-active {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+
+    .status-expired {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .btn-download {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border: none;
+        padding: 0.875rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .btn-download:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(201, 169, 97, 0.3);
+        color: white;
+    }
+
+    .btn-download:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .btn-back {
+        background: white;
+        border: 2px solid var(--primary);
+        color: var(--primary);
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-back:hover {
+        background: var(--primary);
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 20px;
+    }
+
+    .empty-icon {
+        width: 100px;
+        height: 100px;
+        background: rgba(201, 169, 97, 0.1);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header" data-aos="fade-up">
+        <h1 class="page-title">My Certificates</h1>
+        <p class="page-subtitle">View and download your hygiene certificates</p>
+    </div>
+
+    <div class="mb-4" data-aos="fade-up">
+        <a href="/User/homepage/" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    {% if certificates %}
+    <div class="cert-grid">
+        {% for cert in certificates %}
+        <div class="cert-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:100 }}">
+            <div class="cert-card-header">
+                <div class="cert-icon">
+                    <i class="fas fa-certificate"></i>
+                </div>
+                <div class="cert-number">Certificate #{{ cert.certificate_number }}</div>
+                <h3 class="cert-title">Hygiene Excellence Certificate</h3>
+            </div>
+
+            <div class="cert-card-body">
+                <div class="cert-detail-item">
+                    <i class="far fa-calendar cert-detail-icon"></i>
+                    <span class="cert-detail-text">Issued</span>
+                    <span class="cert-detail-value">{{ cert.issue_date|date:"M d, Y" }}</span>
+                </div>
+                <div class="cert-detail-item">
+                    <i class="far fa-calendar-check cert-detail-icon"></i>
+                    <span class="cert-detail-text">Valid Until</span>
+                    <span class="cert-detail-value">{{ cert.valid_till|date:"M d, Y" }}</span>
+                </div>
+            </div>
+
+            <div class="cert-card-footer">
+                <span
+                    class="status-badge {% if cert.status == 'Active' %}status-active{% else %}status-expired{% endif %}">
+                    <i class="fas fa-{% if cert.status == 'Active' %}check-circle{% else %}times-circle{% endif %}"></i>
+                    {{ cert.status }}
+                </span>
+
+                {% if cert.file %}
+                <a href="/User/download-certificate/{{ cert.id }}/" class="btn-download">
+                    <i class="fas fa-download"></i> Download PDF
+                </a>
+                {% else %}
+                <button class="btn-download" disabled>
+                    <i class="fas fa-hourglass-half"></i> Generating...
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state" data-aos="fade-up">
+        <div class="empty-icon">
+            <i class="fas fa-certificate"></i>
+        </div>
+        <h3 style="color: var(--dark); margin-bottom: 1rem;">No Certificates Yet</h3>
+        <p style="color: #6C757D; margin-bottom: 2rem;">You haven't earned any certificates yet. Upload kitchen images
+            for inspection to get certified!</p>
+        <a href="/User/certificate/" class="btn-download" style="max-width: 300px; margin: 0 auto;">
+            <i class="fas fa-camera"></i>
+            Start New Scan
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

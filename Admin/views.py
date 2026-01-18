@@ -10,7 +10,25 @@ from django.contrib import messages
 from datetime import datetime, timedelta
 
 def dashboard(request):
-    return render(request,'Admin/Dashboard.html')
+    # Counts for Stats Cards
+    hotels_count = tbl_hotel.objects.count()
+    clean_count = tbl_hotel.objects.filter(hygiene_status='Clean').count()
+    dirty_count = tbl_hotel.objects.filter(hygiene_status='Dirty').count()
+    pending_count = tbl_hotel.objects.filter(hygiene_status='Pending').count()
+    ver_pending_count = tbl_hotel.objects.filter(is_verified=0).count()
+    
+    # Recent Activity (Last 5 registered hotels)
+    recent_hotels = tbl_hotel.objects.all().order_by('-id')[:5]
+    
+    context = {
+        'hotels_count': hotels_count,
+        'clean_count': clean_count,
+        'dirty_count': dirty_count,
+        'pending_count': pending_count,
+        'ver_pending_count': ver_pending_count,
+        'recent_hotels': recent_hotels
+    }
+    return render(request, 'Admin/Dashboard.html', context)
 
 # def upload_image(request):
 #     context = {}
@@ -262,3 +280,7 @@ def update_verification(request, hotel_id, action):
         messages.warning(request, f"❌ {hotel.hotel_name} has been rejected. They will not be able to log in.")
     
     return redirect('webadmin:approval_requests')
+
+def view_public_complaints(request):
+    complaints = PublicComplaint.objects.all().order_by('-submitted_at')
+    return render(request, 'Admin/PublicComplaints.html', {'complaints': complaints})
