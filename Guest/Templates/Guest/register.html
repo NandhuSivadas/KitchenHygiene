@@ -486,6 +486,20 @@
       }
     }
 
+    .modal-icon.error {
+      background: linear-gradient(135deg, #FF5252, #D32F2F);
+      box-shadow: 0 10px 30px rgba(211, 47, 47, 0.4);
+    }
+
+    .modal-btn.error {
+      background: linear-gradient(135deg, #FF5252, #D32F2F);
+      box-shadow: 0 8px 20px rgba(211, 47, 47, 0.3);
+    }
+
+    .modal-btn.error:hover {
+      box-shadow: 0 12px 30px rgba(211, 47, 47, 0.4);
+    }
+
     .modal-title {
       font-family: 'Playfair Display', serif;
       font-size: 1.8rem;
@@ -671,15 +685,83 @@
     </div>
   </div>
 
+  <!-- Error Modal Popup -->
+  <div class="modal-overlay" id="errorModal">
+    <div class="modal-content">
+      <div class="modal-icon error">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h3 class="modal-title">Validation Error</h3>
+      <p class="modal-message" id="errorMessage">
+        Something went wrong.
+      </p>
+      <button class="modal-btn error" onclick="closeErrorModal()">
+        Try Again
+      </button>
+    </div>
+  </div>
+
   <script>
-    // Handle form submission
     const form = document.querySelector('form');
     const registerBtn = document.getElementById('registerBtn');
     const modal = document.getElementById('approvalModal');
+    const errorModal = document.getElementById('errorModal');
+    const errorMessageElem = document.getElementById('errorMessage');
+
+    function showError(message) {
+      errorMessageElem.textContent = message;
+      errorModal.classList.add('active');
+    }
+
+    function closeErrorModal() {
+      errorModal.classList.remove('active');
+    }
 
     form.addEventListener('submit', function (e) {
-      // Add loading state to button
-      registerBtn.classList.add('loading');
+      let isValid = true;
+      const hotelName = document.getElementById('hotel_name');
+      const email = document.getElementById('hotel_email');
+      const password = document.getElementById('hotel_password');
+      const contact = document.getElementById('hotel_contact');
+      const address = document.getElementById('hotel_address');
+
+      // Validate Hotel Name
+      if (hotelName.value.trim() === '') {
+        showError('Please enter a hotel name.');
+        isValid = false;
+      }
+
+      // Validate Email (only check if previous check passed to avoid stacking alerts, though here we'll just show the first error found or last)
+      // Actually, let's only show one error at a time for better UX
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+        showError('Please enter a valid email address.');
+        isValid = false;
+      }
+
+      // Validate Password
+      else if (password.value.length < 6) {
+        showError('Password must be at least 6 characters long.');
+        isValid = false;
+      }
+
+      // Validate Contact (10 digits)
+      else if (!/^\d{10}$/.test(contact.value)) {
+        showError('Please enter a valid 10-digit contact number.');
+        isValid = false;
+      }
+
+      // Validate Address
+      else if (address.value.trim() === '') {
+        showError('Please enter the hotel address.');
+        isValid = false;
+      }
+
+      if (!isValid) {
+        e.preventDefault(); // Stop submission
+      } else {
+        // Add loading state to button only if valid
+        registerBtn.classList.add('loading');
+      }
     });
 
     // Check if there's a success message from Django
@@ -688,6 +770,9 @@
     {% if message.tags == 'success' %}
     // Show the modal
     modal.classList.add('active');
+    {% else %}
+    // Show error modal for server side errors
+    showError("{{ message }}");
     {% endif %}
     {% endfor %}
     {% endif %}
@@ -702,6 +787,12 @@
     modal.addEventListener('click', function (e) {
       if (e.target === modal) {
         closeModal();
+      }
+    });
+
+    errorModal.addEventListener('click', function (e) {
+      if (e.target === errorModal) {
+        closeErrorModal();
       }
     });
   </script>

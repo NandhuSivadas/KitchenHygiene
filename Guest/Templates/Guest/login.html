@@ -378,6 +378,129 @@
         gap: 1rem;
       }
     }
+
+    /* Modal Popup Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 24px;
+      padding: 40px;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(201, 169, 97, 0.4);
+      animation: slideUp 0.4s ease;
+      text-align: center;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .modal-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(201, 169, 97, 0.4);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .modal-icon.error {
+      background: linear-gradient(135deg, #FF5252, #D32F2F);
+      box-shadow: 0 10px 30px rgba(211, 47, 47, 0.4);
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 15px;
+    }
+
+    .modal-message {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .modal-btn {
+      padding: 14px 40px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 20px rgba(201, 169, 97, 0.3);
+    }
+
+    .modal-btn.error {
+      background: linear-gradient(135deg, #FF5252, #D32F2F);
+      box-shadow: 0 8px 20px rgba(211, 47, 47, 0.3);
+    }
+
+    .modal-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(201, 169, 97, 0.4);
+    }
   </style>
 </head>
 
@@ -467,7 +590,73 @@
         </p>
       </div>
     </div>
-  </div>
+
+    <!-- Error Modal Popup -->
+    <div class="modal-overlay" id="errorModal">
+      <div class="modal-content">
+        <div class="modal-icon error">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3 class="modal-title">Validation Error</h3>
+        <p class="modal-message" id="errorMessage">
+          Something went wrong.
+        </p>
+        <button class="modal-btn error" onclick="closeErrorModal()">
+          Try Again
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const form = document.querySelector('form');
+      const errorModal = document.getElementById('errorModal');
+      const errorMessageElem = document.getElementById('errorMessage');
+
+      function showError(message) {
+        errorMessageElem.textContent = message;
+        errorModal.classList.add('active');
+      }
+
+      function closeErrorModal() {
+        errorModal.classList.remove('active');
+      }
+
+      form.addEventListener('submit', function (e) {
+        let isValid = true;
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+
+        // Validate Email (Clearer logic)
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+          showError('Please enter a valid email address.');
+          isValid = false;
+        }
+        else if (password.value.trim() === '') {
+          showError('Please enter your password.');
+          isValid = false;
+        }
+
+        if (!isValid) {
+          e.preventDefault();
+        }
+      });
+
+      // Close modal when clicking outside
+      errorModal.addEventListener('click', function (e) {
+        if (e.target === errorModal) {
+          closeErrorModal();
+        }
+      });
+
+      // Handle Django Messages with Modal if they are errors
+      {% if messages %}
+      {% for message in messages %}
+      {% if message.tags == 'error' or message.tags == 'warning' %}
+      showError("{{ message }}");
+      {% endif %}
+      {% endfor %}
+      {% endif %}
+    </script>
 </body>
 
 </html>

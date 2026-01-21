@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+import re
 from django.contrib import messages
 from User.models import *   # hotel table
 from Admin.models import *
@@ -14,6 +15,11 @@ def login(request):
     if request.method=="POST":
         email=request.POST.get("txt_email")
         password=request.POST.get("txt_password")
+
+        if not email or not password:
+            messages.error(request, "Please enter both email and password")
+            return render(request,'Guest/login.html')
+            
         hotelcount=tbl_hotel.objects.filter(hotel_email=email,hotel_password=password).count()
         admincount=tbl_admin.objects.filter(admin_email=email,admin_password=password).count()
 
@@ -51,6 +57,27 @@ def register_hotel(request):
         password = request.POST.get("hotel_password")
         contact = request.POST.get("hotel_contact")
         address = request.POST.get("hotel_address")
+
+        # Server-side Validation logic
+        if not all([name, email, password, contact, address]):
+             messages.error(request, "All fields are required.")
+             return render(request, "Guest/register.html")
+
+        if not re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", email):
+             messages.error(request, "Invalid email address.")
+             return render(request, "Guest/register.html")
+
+        if len(password) < 6:
+             messages.error(request, "Password must be at least 6 characters.")
+             return render(request, "Guest/register.html")
+
+        if not re.match(r"^\d{10}$", contact):
+             messages.error(request, "Contact number must be 10 digits.")
+             return render(request, "Guest/register.html")
+
+        if tbl_hotel.objects.filter(hotel_email=email).exists():
+             messages.error(request, "Email is already registered.")
+             return render(request, "Guest/register.html")
 
         tbl_hotel.objects.create(
             hotel_name=name,
