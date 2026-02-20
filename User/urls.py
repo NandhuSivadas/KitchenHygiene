@@ -15,5 +15,6 @@ urlpatterns = [
     path('reports/', views.view_all_reports, name='view_all_reports'),
     path('download-certificate/<int:certificate_id>/', views.download_certificate, name='download_certificate'),
     path('download-report/<int:report_id>/', views.download_report, name='download_report'),
-  
+    path('view-report/<int:report_id>/', views.view_report, name='view_report'),
+    path('download-report-pdf/<int:report_id>/', views.download_report_pdf, name='download_report_pdf'),
 ]

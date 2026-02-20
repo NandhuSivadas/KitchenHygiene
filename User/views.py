@@ -137,23 +137,66 @@ def download_certificate(request, certificate_id):
 
 
 def download_report(request, report_id):
-    """Download violation report PDF"""
-    from django.http import FileResponse, Http404
+    """Download violation report PDF (legacy – serves stored pdf_file if present)"""
+    from django.http import FileResponse
     import os
-    
+
     hotel = _require_hotel(request)
     if not hotel:
         return redirect("guest:login")
-    
+
     report = get_object_or_404(HygieneViolation, id=report_id, hotel=hotel)
-    
+
     if report.pdf_file and os.path.exists(report.pdf_file.path):
         response = FileResponse(open(report.pdf_file.path, 'rb'), content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="Violation_Report_{report.id}.pdf"'
         return response
     else:
-        messages.error(request, "Report file not found.")
-        return redirect('webuser:view_all_reports')
+        # Fall back to preview page if no stored file
+        return redirect('webuser:view_report', report_id=report_id)
+
+
+def view_report(request, report_id):
+    """Show a styled HTML preview of a violation report"""
+    hotel = _require_hotel(request)
+    if not hotel:
+        return redirect("guest:login")
+
+    report = get_object_or_404(HygieneViolation, id=report_id, hotel=hotel)
+    return render(request, 'User/ViewReport.html', {
+        'report': report,
+        'hotel': hotel,
+    })
+
+
+def download_report_pdf(request, report_id):
+    """Generate and download violation report as PDF from HTML template"""
+    from django.http import HttpResponse
+    from django.template.loader import get_template
+    from io import BytesIO
+    import xhtml2pdf.pisa as pisa
+
+    hotel = _require_hotel(request)
+    if not hotel:
+        return redirect("guest:login")
+
+    report = get_object_or_404(HygieneViolation, id=report_id, hotel=hotel)
+
+    template = get_template('User/ReportPDF.html')
+    html_content = template.render({'report': report, 'hotel': hotel}, request)
+
+    buffer = BytesIO()
+    pisa_status = pisa.CreatePDF(html_content, dest=buffer)
+
+    if pisa_status.err:
+        messages.error(request, "Failed to generate PDF. Please try again.")
+        return redirect('webuser:view_report', report_id=report_id)
+
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="ViolationReport_{report.id}_{hotel.hotel_name}.pdf"'
+    return response
+
 
 
 # ── logout ───────────────────────────────────────────────

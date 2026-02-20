@@ -174,7 +174,7 @@
                     <th>Email</th>
                     <th>Contact</th>
                     <th>Status</th>
-                    <th>Hygiene Status</th>
+                   
                 </tr>
             </thead>
             <tbody id="hotelTableBody">
@@ -209,16 +209,7 @@
                         </span>
                         {% endif %}
                     </td>
-                    <td>
-                        {% if hotel.hygiene_status == 'Clean' %}
-                        <span class="status-pill status-clean">Clean</span>
-                        {% elif hotel.hygiene_status == 'Pending' %}
-                        <span class="status-pill"
-                            style="background: rgba(100, 116, 139, 0.15); color: #64748b;">Pending</span>
-                        {% else %}
-                        <span class="status-pill status-unclean">{{ hotel.hygiene_status }}</span>
-                        {% endif %}
-                    </td>
+                    
                 </tr>
                 {% endfor %}
             </tbody>

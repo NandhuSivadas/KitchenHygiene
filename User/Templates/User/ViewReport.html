@@ -1,0 +1,338 @@
+{% extends "User/Header.html" %}
+
+{% block title %}Violation Report #{{ report.id }} - RateMyKitchen{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .report-preview-container {
+        max-width: 860px;
+        margin: 3rem auto;
+        padding: 0 1rem;
+    }
+
+    /* ── Page Header ── */
+    .page-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .page-title {
+        font-size: 2.6rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--dark), var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.4rem;
+    }
+
+    .page-subtitle {
+        color: var(--text-secondary);
+        font-size: 1rem;
+    }
+
+    /* ── Report Card ── */
+    .report-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.10);
+        border: 1px solid rgba(201, 169, 97, 0.15);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    /* Branded top bar */
+    .report-banner {
+        background: linear-gradient(135deg, #1a1a2e 0%, #c9a961 100%);
+        padding: 2rem 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .report-banner h2 {
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .report-banner .report-id {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+        margin-top: 0.3rem;
+    }
+
+    .brand-logo {
+        color: white;
+        font-size: 0.85rem;
+        opacity: 0.8;
+        text-align: right;
+    }
+
+    .brand-logo span {
+        font-weight: 700;
+        font-size: 1rem;
+        display: block;
+        opacity: 1;
+    }
+
+    /* Report body */
+    .report-body {
+        padding: 2.5rem;
+    }
+
+    /* Info grid */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-item {
+        background: #f9f7f2;
+        border-radius: 14px;
+        padding: 1.2rem 1.4rem;
+        border-left: 4px solid var(--primary);
+    }
+
+    .info-item .label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-bottom: 0.4rem;
+    }
+
+    .info-item .value {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--dark);
+    }
+
+    /* Status badge */
+    .status-badge-lg {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.55rem 1.2rem;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .status-dirty {
+        background: rgba(239, 68, 68, 0.12);
+        color: var(--danger);
+    }
+
+    .status-moderate {
+        background: rgba(245, 158, 11, 0.12);
+        color: var(--warning);
+    }
+
+    .status-clean {
+        background: rgba(16, 185, 129, 0.12);
+        color: var(--success);
+    }
+
+    /* Violation details section */
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--dark);
+        border-bottom: 2px solid rgba(201, 169, 97, 0.2);
+        padding-bottom: 0.6rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .recommendations-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .recommendations-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        background: #fff8ee;
+        border-radius: 10px;
+        padding: 0.85rem 1rem;
+        font-size: 0.95rem;
+        color: #4a3a1a;
+    }
+
+    .rec-icon {
+        color: var(--primary);
+        flex-shrink: 0;
+        font-size: 1rem;
+        margin-top: 2px;
+    }
+
+    /* Actions bar */
+    .actions-bar {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+    }
+
+    .btn-download-pdf {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        background: linear-gradient(135deg, var(--primary), #b8923a);
+        color: white;
+        padding: 0.9rem 2rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(201, 169, 97, 0.35);
+    }
+
+    .btn-download-pdf:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(201, 169, 97, 0.5);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: white;
+        border: 2px solid var(--primary);
+        color: var(--primary);
+        padding: 0.9rem 1.6rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-back:hover {
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+    }
+
+    .notice-box {
+        background: rgba(239, 68, 68, 0.06);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        border-radius: 12px;
+        padding: 1rem 1.2rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        color: #991b1b;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="report-preview-container">
+    <!-- Page Header -->
+    <div class="page-header" data-aos="fade-up">
+        <h1 class="page-title">Violation Report</h1>
+        <p class="page-subtitle">Review your hygiene inspection report below</p>
+    </div>
+
+    <!-- Report Card -->
+    <div class="report-card" data-aos="fade-up" data-aos-delay="80">
+
+        <!-- Banner -->
+        <div class="report-banner">
+            <div>
+                <h2><i class="fas fa-file-alt me-2"></i>Hygiene Violation Report</h2>
+                <div class="report-id">Report&nbsp;#{{ report.id }} &nbsp;|&nbsp; {{ report.issue_date|date:"F d, Y" }}
+                </div>
+            </div>
+            <div class="brand-logo">
+                <span>RateMyKitchen</span>
+                AI Hygiene Intelligence
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="report-body">
+
+            {% if report.hygiene_status == 'Dirty' %}
+            <div class="notice-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Immediate action required.</strong>&nbsp; This kitchen was classified as <strong>Dirty</strong>.
+                Please address all violations before resuming full operations.
+            </div>
+            {% endif %}
+
+            <!-- Info Grid -->
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="label"><i class="fas fa-hotel me-1"></i>Establishment</div>
+                    <div class="value">{{ hotel.hotel_name }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label"><i class="far fa-calendar me-1"></i>Issue Date</div>
+                    <div class="value">{{ report.issue_date|date:"F d, Y" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label"><i class="fas fa-map-marker-alt me-1"></i>Address</div>
+                    <div class="value">{{ hotel.hotel_address|default:"—" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label"><i class="fas fa-info-circle me-1"></i>Hygiene Status</div>
+                    <div class="value">
+                        <span class="status-badge-lg
+                            {% if report.hygiene_status == 'Dirty' %}status-dirty
+                            {% elif report.hygiene_status == 'Moderately Clean' %}status-moderate
+                            {% else %}status-clean{% endif %}">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ report.hygiene_status }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="section-title"><i class="fas fa-clipboard-list me-2"></i>Recommended Actions</div>
+            <ul class="recommendations-list">
+                <li><span class="rec-icon"><i class="fas fa-broom"></i></span>Immediate deep cleaning of all kitchen
+                    surfaces is required.</li>
+                <li><span class="rec-icon"><i class="fas fa-user-shield"></i></span>Implement strict hygiene protocols
+                    and conduct staff training.</li>
+                <li><span class="rec-icon"><i class="fas fa-calendar-check"></i></span>Schedule a follow-up inspection
+                    within 7 days.</li>
+                <li><span class="rec-icon"><i class="fas fa-clipboard"></i></span>Maintain daily cleaning logs and
+                    hygiene documentation.</li>
+                <li><span class="rec-icon"><i class="fas fa-check-circle"></i></span>Address all detected violations
+                    before resuming normal operations.</li>
+            </ul>
+
+            <!-- Actions -->
+            <div class="actions-bar">
+                <a href="/User/download-report-pdf/{{ report.id }}/" class="btn-download-pdf">
+                    <i class="fas fa-download"></i> Download PDF
+                </a>
+                <a href="/User/reports/" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Back to Reports
+                </a>
+            </div>
+
+        </div><!-- /.report-body -->
+    </div><!-- /.report-card -->
+</div>
+{% endblock %}
