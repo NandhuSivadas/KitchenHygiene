@@ -18,7 +18,7 @@
                     <th>Hotel Name</th>
                     <th>Email</th>
                     <th>Hygiene Status</th>
-                    <th>Verified</th>
+
                     <th>Action</th>
                 </tr>
             </thead>
@@ -34,13 +34,7 @@
                             {{ hotel.hygiene_status }}
                         </span>
                     </td>
-                    <td>
-                        {% if hotel.is_verified %}
-                        <i class="fas fa-check-circle text-success font-size-lg"></i>
-                        {% else %}
-                        <i class="fas fa-times-circle text-muted"></i>
-                        {% endif %}
-                    </td>
+
                     <td>
                         <a href="{% url 'webadmin:admin_upload_image' hotel.id %}"
                             class="btn btn-sm btn-outline-primary rounded-pill">

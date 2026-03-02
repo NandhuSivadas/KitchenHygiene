@@ -142,22 +142,6 @@
                             </ul>
                         </div>
 
-                        <!-- Description Modal -->
-                        {% if complaint.description %}
-                        <div class="modal fade" id="descModal{{ complaint.id }}" tabindex="-1">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-                                    <div class="modal-header border-0 pb-0">
-                                        <h5 class="modal-title fw-bold">Complaint Description</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <div class="modal-body p-4 text-muted">
-                                        {{ complaint.description }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
                     </td>
                 </tr>
                 {% empty %}
@@ -175,6 +159,26 @@
         </table>
     </div>
 </div>
+
+<!-- Modals -->
+{% for complaint in complaints %}
+{% if complaint.description %}
+<div class="modal fade" id="descModal{{ complaint.id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Complaint Description</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4 text-muted">
+                {{ complaint.description }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+
 
 <style>
     /* Additional Styles if specific to this page */

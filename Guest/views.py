@@ -10,7 +10,7 @@ def homepage(request):
     return render(request, 'Guest/index.html')
 
 
-# ── login ────────────────────────────────────────────────
+
 def login(request):
     if request.method=="POST":
         email=request.POST.get("txt_email")
