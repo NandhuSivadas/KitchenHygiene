@@ -8,7 +8,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from Admin.yolov8_predict import check_hygiene
 from django.contrib import messages
 from datetime import datetime, timedelta
-
+from django.views.decorators.clickjacking import xframe_options_sameorigin
+from django.http import FileResponse, HttpResponse
 def dashboard(request):
     # Counts for Stats Cards
     hotels_count = tbl_hotel.objects.count()
@@ -120,19 +121,70 @@ import os
 
 
 
-def generate_certificate(request, hotel_id):
+
+
+@xframe_options_sameorigin
+def view_report_pdf(request, hotel_id):
     hotel = get_object_or_404(tbl_hotel, id=hotel_id)
-    image_obj = UploadModel.objects.filter(hotel=hotel).order_by('-uploaded_at').first()
-    image_path = image_obj.image.path if image_obj else None
-
-    # Create file path and name
     pdf_name = f"{hotel.hotel_name}_{hotel.hygiene_status}_Report.pdf"
-    pdf_path = os.path.join(settings.MEDIA_ROOT, "violation_reports" if hotel.hygiene_status != "Clean" else "", pdf_name)
+    
+    if hotel.hygiene_status == "Clean":
+        report_dir = settings.MEDIA_ROOT
+    else:
+        report_dir = os.path.join(settings.MEDIA_ROOT, "violation_reports")
+        
+    pdf_path = os.path.join(report_dir, pdf_name)
+    
+    if not os.path.exists(pdf_path):
+        # Auto-generate if missing
+        _generate_pdf_file(hotel)
+        
+    if os.path.exists(pdf_path):
+        return FileResponse(open(pdf_path, 'rb'), content_type='application/pdf')
+    else:
+        return HttpResponse("Error generating Report PDF.", status=500)
 
-    # Ensure directory exists
-    os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
+def download_report_pdf(request, hotel_id):
+    hotel = get_object_or_404(tbl_hotel, id=hotel_id)
+    pdf_name = f"{hotel.hotel_name}_{hotel.hygiene_status}_Report.pdf"
+    
+    if hotel.hygiene_status == "Clean":
+        report_dir = settings.MEDIA_ROOT
+    else:
+        report_dir = os.path.join(settings.MEDIA_ROOT, "violation_reports")
+        
+    pdf_path = os.path.join(report_dir, pdf_name)
+    
+    if not os.path.exists(pdf_path):
+        _generate_pdf_file(hotel)
+        
+    if os.path.exists(pdf_path):
+        return FileResponse(open(pdf_path, 'rb'), as_attachment=True, filename=pdf_name)
+    else:
+        messages.error(request, "Report PDF file not found to download.")
+        return redirect('webadmin:view_reports')
 
-    # Generate PDF
+def _generate_pdf_file(hotel):
+    image_obj = UploadModel.objects.filter(hotel=hotel).order_by('-uploaded_at').first()
+    image_path = None
+    if image_obj and image_obj.image:
+        try:
+            image_path = image_obj.image.path
+        except ValueError:
+            pass
+
+    pdf_name = f"{hotel.hotel_name}_{hotel.hygiene_status}_Report.pdf"
+    
+    if hotel.hygiene_status == "Clean":
+        report_dir = settings.MEDIA_ROOT
+    else:
+        report_dir = os.path.join(settings.MEDIA_ROOT, "violation_reports")
+        
+    pdf_path = os.path.join(report_dir, pdf_name)
+
+    if report_dir:
+        os.makedirs(report_dir, exist_ok=True)
+
     c = canvas.Canvas(pdf_path, pagesize=A4)
     width, height = A4
 
@@ -146,7 +198,6 @@ def generate_certificate(request, hotel_id):
     c.drawString(100, 670, f"Issued on: {datetime.today().strftime('%Y-%m-%d')}")
 
     if hotel.hygiene_status == "Clean":
-        # Generate clean certificate
         Certificate.objects.create(
             hotel=hotel,
             valid_till=datetime.today() + timedelta(days=365)
@@ -157,7 +208,6 @@ def generate_certificate(request, hotel_id):
         c.drawString(100, 640, "✅ Certified Clean! This kitchen meets hygiene standards.")
         c.setFillColorRGB(0, 0, 0)
     else:
-        # Warning for dirty or moderate
         c.setFont("Helvetica-Bold", 16)
         c.setFillColorRGB(1, 0, 0)
         c.drawString(100, 640, "⚠️ Hygiene Violation Detected!")
@@ -165,7 +215,6 @@ def generate_certificate(request, hotel_id):
         c.setFillColorRGB(0, 0, 0)
         c.drawString(100, 620, "Please review and improve hygiene practices.")
 
-        # Add image
         if image_path and os.path.exists(image_path):
             try:
                 img = ImageReader(image_path)
@@ -174,32 +223,34 @@ def generate_certificate(request, hotel_id):
             except:
                 c.drawString(100, 360, "⚠️ Image could not be displayed.")
 
-        # Save violation record
         HygieneViolation.objects.create(
             hotel=hotel,
             hygiene_status=hotel.hygiene_status,
-            pdf_file=f"violation_reports/{pdf_name}"  # path relative to MEDIA
+            pdf_file=f"violation_reports/{pdf_name}"
         )
 
     c.setFont("Helvetica", 12)
     c.drawString(100, 150, "Issued by: Kitchen Hygiene Monitoring System")
     c.showPage()
     c.save()
-
     hotel.save()
+    return pdf_path
+
+def generate_certificate(request, hotel_id):
+    hotel = get_object_or_404(tbl_hotel, id=hotel_id)
+    _generate_pdf_file(hotel)
     
-    # Notify user
     messages.success(request, f"Certificate/Report for {hotel.hotel_name} has been generated and sent successfully.")
-    
-    # Redirect back to hotel list or dashboard
     return redirect('webadmin:view_hotels')
+
+
 
 def view_reports(request):
     status = request.GET.get('status')
     if status and status != 'All':
         hotels = tbl_hotel.objects.filter(hygiene_status=status)
     else:
-        hotels = tbl_hotel.objects.all()
+        hotels = tbl_hotel.objects.exclude(hygiene_status='Pending')
     
     return render(request, 'Admin/Reports.html', {'hotels': hotels, 'current_status': status})
 
@@ -290,3 +341,25 @@ def delete_public_complaint(request, complaint_id):
     complaint.delete()
     messages.success(request, "Complaint deleted successfully.")
     return redirect('webadmin:view_public_complaints')
+
+import csv
+from django.http import HttpResponse
+
+def export_complaints(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="public_complaints.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Hotel Name', 'Date Submitted', 'AI Analysis Status', 'Priority', 'Description'])
+
+    complaints = PublicComplaint.objects.all().order_by('-submitted_at')
+    for complaint in complaints:
+        writer.writerow([
+            complaint.hotel.hotel_name if complaint.hotel else 'N/A',
+            complaint.submitted_at.strftime("%Y-%m-%d %H:%M:%S") if complaint.submitted_at else 'N/A',
+            complaint.ai_status,
+            complaint.priority,
+            complaint.description
+        ])
+
+    return response
