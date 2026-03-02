@@ -284,3 +284,9 @@ def update_verification(request, hotel_id, action):
 def view_public_complaints(request):
     complaints = PublicComplaint.objects.all().order_by('-submitted_at')
     return render(request, 'Admin/PublicComplaints.html', {'complaints': complaints})
+
+def delete_public_complaint(request, complaint_id):
+    complaint = get_object_or_404(PublicComplaint, id=complaint_id)
+    complaint.delete()
+    messages.success(request, "Complaint deleted successfully.")
+    return redirect('webadmin:view_public_complaints')

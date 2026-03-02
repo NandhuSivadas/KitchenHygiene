@@ -129,13 +129,13 @@
                                 {% endif %}
                                 <li>
                                     <a class="dropdown-item rounded-2 d-flex align-items-center gap-2 py-2 text-success"
-                                        href="#">
+                                        href="{% url 'webadmin:admin_upload_image' complaint.hotel.id %}">
                                         <i class="fas fa-check-circle"></i> Resolve
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item rounded-2 d-flex align-items-center gap-2 py-2 text-danger"
-                                        href="#">
+                                        href="{% url 'webadmin:delete_public_complaint' complaint.id %}">
                                         <i class="fas fa-trash-alt"></i> Delete
                                     </a>
                                 </li>

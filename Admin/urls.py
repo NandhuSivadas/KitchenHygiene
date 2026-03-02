@@ -13,6 +13,7 @@ urlpatterns = [
     path('approval_requests/', views.approval_requests, name='approval_requests'),
     path('update_verification/<int:hotel_id>/<str:action>/', views.update_verification, name='update_verification'),
     path('public-complaints/', views.view_public_complaints, name='view_public_complaints'),
+    path('delete-public-complaint/<int:complaint_id>/', views.delete_public_complaint, name='delete_public_complaint'),
 
 
 ]
