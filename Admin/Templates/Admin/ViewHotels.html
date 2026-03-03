@@ -4,41 +4,50 @@
 {% block page_title %}Hotels{% endblock %}
 
 {% block content %}
-<div class="section-glass">
-    <div class="section-header">
-        <h4 class="section-title">Registered Hotels</h4>
-        <button class="btn btn-primary rounded-pill px-4"><i class="fas fa-plus me-2"></i> Add New</button>
+<div class="section-card">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="section-title m-0">Registered Hotels</h4>
+        <button class="btn-modern rounded-pill px-4"><i class="fas fa-plus me-2 text-white"></i> Add New</button>
     </div>
 
     <div class="custom-table-container">
         <table class="custom-table">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th style="width: 50px; text-align: center;">#</th>
                     <th>Hotel Name</th>
                     <th>Email</th>
                     <th>Hygiene Status</th>
-
-                    <th>Action</th>
+                    <th style="text-align: center;">Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for hotel in hotels %}
                 <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td><span style="font-weight: 600; color: var(--dark);">{{ hotel.hotel_name }}</span></td>
-                    <td>{{ hotel.hotel_email }}</td>
+                    <td style="text-align: center;">
+                        <span style="font-weight: 600; color: #64748b; font-size: 0.9rem;">{{ forloop.counter }}</span>
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div
+                                style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+                                {{ hotel.hotel_name|first|upper }}
+                            </div>
+                            <span style="font-weight: 600; color: var(--text-main);">{{ hotel.hotel_name }}</span>
+                        </div>
+                    </td>
+                    <td style="color: #64748b;">{{ hotel.hotel_email }}</td>
                     <td>
                         <span
                             class="status-pill {% if hotel.hygiene_status == 'Clean' %}status-clean{% else %}status-unclean{% endif %}">
-                            {{ hotel.hygiene_status }}
+                            {% if hotel.hygiene_status == 'Clean' %}<i class="fas fa-check-circle"
+                                style="font-size: 0.7rem;"></i>{% else %}<i class="fas fa-times-circle"
+                                style="font-size: 0.7rem;"></i>{% endif %} {{ hotel.hygiene_status }}
                         </span>
                     </td>
-
-                    <td>
-                        <a href="{% url 'webadmin:admin_upload_image' hotel.id %}"
-                            class="btn btn-sm btn-outline-primary rounded-pill">
-                            <i class="fas fa-upload me-1"></i> Upload
+                    <td style="text-align: center;">
+                        <a href="{% url 'webadmin:admin_upload_image' hotel.id %}" class="btn-modern btn-sm px-3 py-2">
+                            <i class="fas fa-microscope text-white"></i> <span class="ms-1 text-white">Inspect</span>
                         </a>
                     </td>
                 </tr>

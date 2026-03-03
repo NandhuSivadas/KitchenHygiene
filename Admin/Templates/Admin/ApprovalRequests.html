@@ -35,10 +35,10 @@
 </div>
 
 <!-- Pending Requests Section -->
-<div class="section-glass" id="pending-section">
+<div class="section-card" id="pending-section">
     <div class="section-header"
         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h4 class="section-title" style="margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--dark);">
+        <h4 class="section-title" style="margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--text-main);">
             <i class="fas fa-user-clock" style="color: var(--warning); margin-right: 10px;"></i>
             Pending Approval Requests
         </h4>
@@ -74,7 +74,7 @@
                                 style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
                                 {{ hotel.hotel_name|first|upper }}
                             </div>
-                            <span style="font-weight: 600; color: var(--dark);">{{ hotel.hotel_name }}</span>
+                            <span style="font-weight: 600; color: var(--text-main);">{{ hotel.hotel_name }}</span>
                         </div>
                     </td>
                     <td>
@@ -108,20 +108,12 @@
                     <td>
                         <div style="display: flex; gap: 8px;">
                             <button onclick="showApproveModal('{{ hotel.id }}', '{{ hotel.hotel_name }}')"
-                                class="btn btn-sm"
-                                style="background: linear-gradient(135deg, var(--success), #059669); color: white; border: none; border-radius: 10px; padding: 8px 16px; font-weight: 600; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;"
-                                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(16, 185, 129, 0.3)';"
-                                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-                                <i class="fas fa-check"></i>
-                                Approve
+                                class="btn-modern-success btn-sm px-3 py-2">
+                                <i class="fas fa-check"></i> Approve
                             </button>
                             <button onclick="showRejectModal('{{ hotel.id }}', '{{ hotel.hotel_name }}')"
-                                class="btn btn-sm"
-                                style="background: linear-gradient(135deg, var(--danger), #dc2626); color: white; border: none; border-radius: 10px; padding: 8px 16px; font-weight: 600; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;"
-                                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(239, 68, 68, 0.3)';"
-                                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-                                <i class="fas fa-times"></i>
-                                Reject
+                                class="btn-modern-danger btn-sm px-3 py-2">
+                                <i class="fas fa-times"></i> Reject
                             </button>
                         </div>
                     </td>
@@ -136,17 +128,17 @@
             style="width: 100px; height: 100px; background: rgba(16, 185, 129, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
             <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success);"></i>
         </div>
-        <h4 style="color: var(--dark); font-weight: 700; margin-bottom: 0.5rem;">All Caught Up!</h4>
+        <h4 style="color: var(--text-main); font-weight: 700; margin-bottom: 0.5rem;">All Caught Up!</h4>
         <p style="color: #64748b; margin: 0;">No pending approval requests at the moment.</p>
     </div>
     {% endif %}
 </div>
 
 <!-- All Hotels Section -->
-<div class="section-glass" id="all-hotels-section">
+<div class="section-card" id="all-hotels-section">
     <div class="section-header"
         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h4 class="section-title" style="margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--dark);">
+        <h4 class="section-title" style="margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--text-main);">
             <i class="fas fa-list" style="color: var(--primary); margin-right: 10px;"></i>
             All Hotel Registrations
         </h4>
@@ -194,7 +186,7 @@
                                 style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
                                 {{ hotel.hotel_name|first|upper }}
                             </div>
-                            <span style="font-weight: 600; color: var(--dark);">{{ hotel.hotel_name }}</span>
+                            <span style="font-weight: 600; color: var(--text-main);">{{ hotel.hotel_name }}</span>
                         </div>
                     </td>
                     <td style="color: #64748b;">{{ hotel.hotel_email }}</td>
@@ -229,7 +221,7 @@
     .section-title {
         font-size: 1.25rem;
         font-weight: 700;
-        color: var(--dark);
+        color: var(--text-main);
     }
 
     .section-header {
@@ -335,11 +327,11 @@
             <i class="fas fa-check-circle"></i>
         </div>
         <h3 class="modal-title"
-            style="font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--dark); margin-bottom: 15px;">
+            style="font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 15px;">
             Approve Hotel Registration?
         </h3>
         <p class="modal-message" style="color: #64748b; font-size: 1rem; line-height: 1.6; margin-bottom: 30px;">
-            You are about to approve <strong id="approveHotelName" style="color: var(--dark);"></strong>.
+            You are about to approve <strong id="approveHotelName" style="color: var(--text-main);"></strong>.
             They will be able to log in and access their account immediately.
         </p>
         <div style="display: flex; gap: 12px; justify-content: center;">
@@ -365,11 +357,11 @@
             <i class="fas fa-times-circle"></i>
         </div>
         <h3 class="modal-title"
-            style="font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--dark); margin-bottom: 15px;">
+            style="font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 15px;">
             Reject Hotel Registration?
         </h3>
         <p class="modal-message" style="color: #64748b; font-size: 1rem; line-height: 1.6; margin-bottom: 30px;">
-            You are about to reject <strong id="rejectHotelName" style="color: var(--dark);"></strong>.
+            You are about to reject <strong id="rejectHotelName" style="color: var(--text-main);"></strong>.
             They will <strong style="color: var(--danger);">NOT</strong> be able to log in to their account.
         </p>
         <div style="display: flex; gap: 12px; justify-content: center;">

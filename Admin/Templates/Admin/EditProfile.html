@@ -5,27 +5,27 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6">
-        <div class="section-glass">
+        <div class="section-card">
             <h4 class="section-title mb-4">Profile Information</h4>
             <form method="POST">{% csrf_token %}
                 <div class="mb-4">
                     <label class="form-label text-muted fw-bold small text-uppercase">Name</label>
-                    <input type="text" name="txt_name" class="form-control" value="{{ user.username }}">
+                    <input type="text" name="txt_name" class="modern-input" value="{{ user.username }}">
                 </div>
                 <div class="mb-4">
                     <label class="form-label text-muted fw-bold small text-uppercase">Email</label>
-                    <input type="email" name="txt_email" class="form-control" value="{{ user.email }}">
+                    <input type="email" name="txt_email" class="modern-input" value="{{ user.email }}">
                 </div>
                 <div class="mb-4">
                     <label class="form-label text-muted fw-bold small text-uppercase">Contact</label>
-                    <input type="text" name="txt_contact" class="form-control" value="{{ user.contact_number }}">
+                    <input type="text" name="txt_contact" class="modern-input" value="{{ user.contact_number }}">
                 </div>
                 <div class="mb-4">
                     <label class="form-label text-muted fw-bold small text-uppercase">Address</label>
-                    <input type="text" name="txt_address" class="form-control" value="{{ user.address }}">
+                    <input type="text" name="txt_address" class="modern-input" value="{{ user.address }}">
                 </div>
-                <div class="text-end">
-                    <button type="submit" class="btn btn-success shadow-lg">Save Changes</button>
+                <div class="text-end mt-5">
+                    <button type="submit" class="btn-modern-success px-5">Save Changes</button>
                 </div>
             </form>
         </div>

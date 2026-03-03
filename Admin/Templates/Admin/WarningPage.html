@@ -4,7 +4,7 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-6">
-        <div class="section-glass border-danger" style="border-width: 2px;">
+        <div class="section-card border-danger" style="border-width: 2px;">
             <div class="text-center mb-4">
                 <i class="fas fa-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
                 <h4 class="mt-3 text-danger fw-bold">Hygiene Violation Alert</h4>
@@ -33,11 +33,12 @@
             </div>
 
             <div class="text-center mt-4">
-                <a href="{% url 'webadmin:view_hotels' %}" class="btn btn-outline-secondary rounded-pill px-4">
+                <a href="{% url 'webadmin:view_hotels' %}" class="btn-outline-modern px-4"
+                    style="color: var(--text-muted); border-color: var(--dark-border);">
                     <i class="fas fa-arrow-left me-2"></i> Back to Hotels
                 </a>
-                <button class="btn btn-danger rounded-pill px-4 ms-2">
-                    <i class="fas fa-paper-plane me-2"></i> Send Alert
+                <button class="btn-modern-danger px-4 ms-2">
+                    <i class="fas fa-paper-plane me-2 text-white"></i> Send Alert
                 </button>
             </div>
         </div>

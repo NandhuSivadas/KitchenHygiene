@@ -4,47 +4,55 @@
 {% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="stats-grid">
-    <div class="stat-card primary">
-        <div class="stat-icon-wrapper">
-            <i class="fas fa-hotel"></i>
+<div class="row g-4 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card primary" style="animation-delay: 0.1s;">
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-hotel"></i>
+            </div>
+            <div class="stat-value">{{ hotels_count }}</div>
+            <div class="stat-label">Total Kitchens</div>
+            <i class="fas fa-hotel stat-bg-icon"></i>
         </div>
-        <div class="stat-value">{{ hotels_count }}</div>
-        <div class="stat-label">Total Kitchens</div>
-        <i class="fas fa-hotel stat-bg-icon"></i>
     </div>
 
-    <div class="stat-card success">
-        <div class="stat-icon-wrapper">
-            <i class="fas fa-shield-alt"></i>
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card success" style="animation-delay: 0.2s;">
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="stat-value">{{ clean_count }}</div>
+            <div class="stat-label">Hygiene Safe</div>
+            <i class="fas fa-shield-alt stat-bg-icon"></i>
         </div>
-        <div class="stat-value">{{ clean_count }}</div>
-        <div class="stat-label">Hygiene Safe</div>
-        <i class="fas fa-shield-alt stat-bg-icon"></i>
     </div>
 
-    <div class="stat-card danger">
-        <div class="stat-icon-wrapper">
-            <i class="fas fa-biohazard"></i>
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card danger" style="animation-delay: 0.3s;">
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-biohazard"></i>
+            </div>
+            <div class="stat-value">{{ dirty_count }}</div>
+            <div class="stat-label">Violations</div>
+            <i class="fas fa-biohazard stat-bg-icon"></i>
         </div>
-        <div class="stat-value">{{ dirty_count }}</div>
-        <div class="stat-label">Violations</div>
-        <i class="fas fa-biohazard stat-bg-icon"></i>
     </div>
 
-    <div class="stat-card warning">
-        <div class="stat-icon-wrapper">
-            <i class="fas fa-user-clock"></i>
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card warning" style="animation-delay: 0.4s;">
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-user-clock"></i>
+            </div>
+            <div class="stat-value">{{ ver_pending_count }}</div>
+            <div class="stat-label">Pending Approval</div>
+            <i class="fas fa-user-clock stat-bg-icon"></i>
         </div>
-        <div class="stat-value">{{ ver_pending_count }}</div>
-        <div class="stat-label">Pending Approval</div>
-        <i class="fas fa-user-clock stat-bg-icon"></i>
     </div>
 </div>
 
 <div class="row g-4 mb-4">
     <div class="col-lg-8">
-        <div class="section-glass h-100">
+        <div class="section-card h-100">
             <h5 class="section-title mb-4">Hygiene Analytics & Trends</h5>
             <div style="height: 300px; width: 100%;">
                 <canvas id="hygieneChart"></canvas>
@@ -53,7 +61,7 @@
     </div>
 
     <div class="col-lg-4">
-        <div class="section-glass h-100">
+        <div class="section-card h-100">
             <h5 class="section-title mb-4">Registration Status</h5>
             <div style="height: 300px; width: 100%; position: relative;">
                 <canvas id="verificationChart"></canvas>
@@ -64,10 +72,10 @@
 
 <div class="row">
     <div class="col-12">
-        <div class="section-glass">
+        <div class="section-card" style="animation-delay: 0.5s;">
             <div class="section-header d-flex justify-content-between align-items-center mb-4">
                 <h4 class="section-title m-0">Recently Registered Kitchens</h4>
-                <a href="{% url 'webadmin:view_hotels' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">View
+                <a href="{% url 'webadmin:view_hotels' %}" class="btn-outline-modern btn-sm px-4">View
                     All</a>
             </div>
 
@@ -113,9 +121,8 @@
                                 </span>
                             </td>
                             <td>
-                                <a href="{% url 'webadmin:admin_upload_image' hotel.id %}"
-                                    class="btn btn-sm btn-light rounded-circle shadow-sm">
-                                    <i class="fas fa-eye text-primary"></i>
+                                <a href="{% url 'webadmin:admin_upload_image' hotel.id %}" class="btn-modern btn-sm">
+                                    <i class="fas fa-microscope text-white me-1"></i> Inspect
                                 </a>
                             </td>
                         </tr>
@@ -138,10 +145,11 @@
     // Data from Django Context
     // Fixed: Removed "|default:0" because .count() in views guarantees a number.
     // This prevents your code editor from adding spaces and breaking Django.
-    const cleanCount = {{ clean_count }};
-    const dirtyCount = {{ dirty_count }};
-    const pendingCount = {{ pending_count }};
-    const hotelsCount = {{ hotels_count }};
+    // Fixed: Added quotes or used JS conditional logic to avoid breaking JS compiler
+    const cleanCount = parseInt('{{ clean_count|default:"0" }}') || 0;
+    const dirtyCount = parseInt('{{ dirty_count|default:"0" }}') || 0;
+    const pendingCount = parseInt('{{ pending_count|default:"0" }}') || 0;
+    const hotelsCount = parseInt('{{ hotels_count|default:"0" }}') || 0;
 
     // Chart 1: Hygiene Bar Chart
     const ctxHygiene = document.getElementById('hygieneChart').getContext('2d');

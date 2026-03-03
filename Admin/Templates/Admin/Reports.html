@@ -3,7 +3,7 @@
 {% block page_title %}Hygiene Reports{% endblock %}
 
 {% block content %}
-<div class="section-glass">
+<div class="section-card">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
         <h4 class="section-title m-0">Kitchen Reports</h4>
 
@@ -53,7 +53,7 @@
                                 {{ hotel.hotel_name.0|upper }}
                             </div>
                             <div>
-                                <div style="font-weight: 600; color: var(--dark);">{{ hotel.hotel_name }}</div>
+                                <div style="font-weight: 600; color: var(--text-main);">{{ hotel.hotel_name }}</div>
                                 <div style="font-size: 0.85rem; color: #64748b;">{{ hotel.hotel_email }}</div>
                             </div>
                         </div>
@@ -81,10 +81,7 @@
                         {% endif %}
                     </td>
                     <td style="text-align: right;">
-                        <button type="button" class="btn btn-sm d-inline-flex align-items-center gap-2"
-                            style="background: linear-gradient(135deg, var(--success), #059669); color: white; border: none; border-radius: 10px; padding: 8px 16px; font-weight: 600; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2); transition: all 0.3s ease;"
-                            onmouseover="this.style.transform='translateY(-2px)';"
-                            onmouseout="this.style.transform='translateY(0)';" data-bs-toggle="modal"
+                        <button type="button" class="btn-modern-success btn-sm px-3 py-2" data-bs-toggle="modal"
                             data-bs-target="#reportModal{{ hotel.id }}">
                             <i class="fas fa-eye"></i> View Report
                         </button>
@@ -97,7 +94,7 @@
                             style="width: 80px; height: 80px; background: rgba(148, 163, 184, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
                             <i class="fas fa-folder-open" style="font-size: 2.5rem; color: #94a3b8;"></i>
                         </div>
-                        <h5 style="color: var(--dark); font-weight: 700; margin-bottom: 0.5rem;">No reports found</h5>
+                        <h5 style="color: var(--text-main); font-weight: 700; margin-bottom: 0.5rem;">No reports found</h5>
                         <p style="color: #64748b; margin: 0;">Try adjusting the filters.</p>
                     </td>
                 </tr>
