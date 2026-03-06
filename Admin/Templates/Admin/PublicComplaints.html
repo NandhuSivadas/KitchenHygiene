@@ -38,9 +38,43 @@
             <p class="text-muted small m-0">Review hygiene complaints submitted by the public.</p>
         </div>
         <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                <i class="fas fa-filter me-2"></i>Filter
-            </button>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-primary rounded-pill px-3 dropdown-toggle" type="button"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-filter me-2"></i>Filter
+                </button>
+                <ul class="dropdown-menu shadow-sm" style="border-radius: 12px; border: 1px solid #eee;">
+                    <li>
+                        <h6 class="dropdown-header text-uppercase" style="font-size: 0.75rem;">By Priority</h6>
+                    </li>
+                    <li><a class="dropdown-item {% if current_priority == 'High' %}active{% endif %}"
+                            href="?{% if current_status %}status={{ current_status }}&{% endif %}priority=High">High
+                            Priority</a></li>
+                    <li><a class="dropdown-item {% if current_priority == 'Low' %}active{% endif %}"
+                            href="?{% if current_status %}status={{ current_status }}&{% endif %}priority=Low">Normal
+                            Priority</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <h6 class="dropdown-header text-uppercase" style="font-size: 0.75rem;">By AI Status</h6>
+                    </li>
+                    <li><a class="dropdown-item {% if current_status == 'Clean' %}active{% endif %}"
+                            href="?status=Clean{% if current_priority %}&priority={{ current_priority }}{% endif %}">Clean</a>
+                    </li>
+                    <li><a class="dropdown-item {% if current_status == 'Moderately Clean' %}active{% endif %}"
+                            href="?status=Moderately Clean{% if current_priority %}&priority={{ current_priority }}{% endif %}">Moderate</a>
+                    </li>
+                    <li><a class="dropdown-item {% if current_status == 'Dirty' %}active{% endif %}"
+                            href="?status=Dirty{% if current_priority %}&priority={{ current_priority }}{% endif %}">Dirty</a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item text-danger text-center fw-bold"
+                            href="{% url 'webadmin:view_public_complaints' %}">Clear Filters</a></li>
+                </ul>
+            </div>
             <a href="{% url 'webadmin:export_complaints' %}" class="btn btn-sm btn-outline-success rounded-pill px-3">
                 <i class="fas fa-download me-2"></i>Export
             </a>

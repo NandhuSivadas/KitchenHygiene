@@ -1,13 +1,11 @@
 # Admin/views.py
 from Admin.models import tbl_admin
 from User.models  import *
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .yolov8_predict import check_hygiene
-from django.shortcuts import render, redirect, get_object_or_404
-from Admin.yolov8_predict import check_hygiene
-from django.contrib import messages
 from datetime import datetime, timedelta
+import re
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.http import FileResponse, HttpResponse
 def dashboard(request):
@@ -53,9 +51,54 @@ def dashboard(request):
 
 
 def view_hotels(request):
-    hotels = tbl_hotel.objects.all()
-    return render(request, 'Admin/ViewHotels.html', {'hotels': hotels})
+    query = request.GET.get('q', '')
+    if query:
+        hotels = tbl_hotel.objects.filter(hotel_name__icontains=query)
+    else:
+        hotels = tbl_hotel.objects.all()
+    return render(request, 'Admin/ViewHotels.html', {'hotels': hotels, 'search_query': query})
 
+def add_hotel(request):
+    if request.method == "POST":
+        name = request.POST.get("hotel_name")
+        email = request.POST.get("hotel_email")
+        password = request.POST.get("hotel_password")
+        contact = request.POST.get("hotel_contact")
+        address = request.POST.get("hotel_address")
+
+        if not all([name, email, password, contact, address]):
+             messages.error(request, "All fields are required.")
+             return render(request, "Admin/AddHotel.html")
+
+        if not re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", email):
+             messages.error(request, "Invalid email address.")
+             return render(request, "Admin/AddHotel.html")
+
+        if len(password) < 6:
+             messages.error(request, "Password must be at least 6 characters.")
+             return render(request, "Admin/AddHotel.html")
+
+        if not re.match(r"^\d{10}$", contact):
+             messages.error(request, "Contact number must be 10 digits.")
+             return render(request, "Admin/AddHotel.html")
+
+        if tbl_hotel.objects.filter(hotel_email=email).exists():
+             messages.error(request, "Email is already registered.")
+             return render(request, "Admin/AddHotel.html")
+
+        tbl_hotel.objects.create(
+            hotel_name=name,
+            hotel_email=email,
+            hotel_password=password,
+            hotel_contact=contact,
+            hotel_address=address,
+            is_verified=1  # Verified since added by Admin
+        )
+
+        messages.success(request, "Hotel added successfully!")
+        return redirect('webadmin:view_hotels')
+
+    return render(request, "Admin/AddHotel.html")
 
 
 def admin_upload_image(request, hotel_id):
@@ -247,12 +290,17 @@ def generate_certificate(request, hotel_id):
 
 def view_reports(request):
     status = request.GET.get('status')
+    query = request.GET.get('q', '')
+    
     if status and status != 'All':
         hotels = tbl_hotel.objects.filter(hygiene_status=status)
     else:
         hotels = tbl_hotel.objects.exclude(hygiene_status='Pending')
+        
+    if query:
+        hotels = hotels.filter(hotel_name__icontains=query)
     
-    return render(request, 'Admin/Reports.html', {'hotels': hotels, 'current_status': status})
+    return render(request, 'Admin/Reports.html', {'hotels': hotels, 'current_status': status, 'search_query': query})
 
 from django.http import JsonResponse
 from django.core.files.base import ContentFile
@@ -334,7 +382,23 @@ def update_verification(request, hotel_id, action):
 
 def view_public_complaints(request):
     complaints = PublicComplaint.objects.all().order_by('-submitted_at')
-    return render(request, 'Admin/PublicComplaints.html', {'complaints': complaints})
+    
+    # Filter by AI Status
+    status_filter = request.GET.get('status')
+    if status_filter:
+        complaints = complaints.filter(ai_status=status_filter)
+        
+    # Filter by Priority
+    priority_filter = request.GET.get('priority')
+    if priority_filter:
+        complaints = complaints.filter(priority=priority_filter)
+        
+    context = {
+        'complaints': complaints,
+        'current_status': status_filter,
+        'current_priority': priority_filter
+    }
+    return render(request, 'Admin/PublicComplaints.html', context)
 
 def delete_public_complaint(request, complaint_id):
     complaint = get_object_or_404(PublicComplaint, id=complaint_id)

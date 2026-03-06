@@ -6,6 +6,7 @@ app_name="webadmin"
 urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('view_hotels/', views.view_hotels, name='view_hotels'),
+    path('add_hotel/', views.add_hotel, name='add_hotel'),
     path('upload_image/<int:hotel_id>/', views.admin_upload_image,name='admin_upload_image'),
     path('generate_certificate/<int:hotel_id>/', views.generate_certificate, name='generate_certificate'),
     path('view_report/<int:hotel_id>/', views.view_report_pdf, name='view_report_pdf'),

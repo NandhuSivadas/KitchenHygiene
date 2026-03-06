@@ -7,7 +7,22 @@
 <div class="section-card">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="section-title m-0">Registered Hotels</h4>
-        <button class="btn-modern rounded-pill px-4"><i class="fas fa-plus me-2 text-white"></i> Add New</button>
+        <div class="d-flex gap-3 align-items-center">
+            <form method="GET" class="d-flex m-0">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control" placeholder="Search by name..."
+                        value="{{ search_query|default_if_none:'' }}"
+                        style="border-radius: 20px 0 0 20px; border: 2px solid #E5E7EB; border-right: none; padding-left: 20px; box-shadow: none;">
+                    <button class="btn bg-white text-muted" type="submit"
+                        style="border-radius: 0 20px 20px 0; border: 2px solid #E5E7EB; border-left: none; box-shadow: none;">
+                        <i class="fas fa-search pt-1"></i>
+                    </button>
+                </div>
+            </form>
+            <a href="{% url 'webadmin:add_hotel' %}" class="btn-modern rounded-pill px-4 text-decoration-none"
+                style="display: inline-flex; align-items: center;"><i class="fas fa-plus me-2 text-white"></i> <span
+                    class="text-white">Add New</span></a>
+        </div>
     </div>
 
     <div class="custom-table-container">

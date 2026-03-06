@@ -8,23 +8,40 @@
         <h4 class="section-title m-0">Kitchen Reports</h4>
 
         <!-- Filter Controls -->
-        <div class="d-flex gap-2">
-            <a href="{% url 'webadmin:view_reports' %}?status=All"
-                class="btn btn-sm rounded-pill px-3 {% if not current_status or current_status == 'All' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
-                All
-            </a>
-            <a href="{% url 'webadmin:view_reports' %}?status=Clean"
-                class="btn btn-sm rounded-pill px-3 {% if current_status == 'Clean' %}btn-success{% else %}btn-outline-success{% endif %}">
-                Clean
-            </a>
-            <a href="{% url 'webadmin:view_reports' %}?status=Moderately Clean"
-                class="btn btn-sm rounded-pill px-3 {% if current_status == 'Moderately Clean' %}btn-warning{% else %}btn-outline-warning{% endif %}">
-                Moderate
-            </a>
-            <a href="{% url 'webadmin:view_reports' %}?status=Dirty"
-                class="btn btn-sm rounded-pill px-3 {% if current_status == 'Dirty' %}btn-danger{% else %}btn-outline-danger{% endif %}">
-                Dirty
-            </a>
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+            <!-- Search Form -->
+            <form method="GET" class="d-flex m-0">
+                <input type="hidden" name="status" value="{{ current_status|default_if_none:'' }}">
+                <div class="input-group" style="width: 250px;">
+                    <input type="text" name="q" class="form-control" placeholder="Search by name..."
+                        value="{{ search_query|default_if_none:'' }}"
+                        style="border-radius: 20px 0 0 20px; border: 2px solid #E5E7EB; border-right: none; padding-left: 20px; box-shadow: none;">
+                    <button class="btn bg-white text-muted" type="submit"
+                        style="border-radius: 0 20px 20px 0; border: 2px solid #E5E7EB; border-left: none; box-shadow: none;">
+                        <i class="fas fa-search pt-1"></i>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Status Buttons -->
+            <div class="d-flex gap-2">
+                <a href="{% url 'webadmin:view_reports' %}?status=All{% if search_query %}&q={{ search_query }}{% endif %}"
+                    class="btn btn-sm rounded-pill px-3 {% if not current_status or current_status == 'All' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                    All
+                </a>
+                <a href="{% url 'webadmin:view_reports' %}?status=Clean{% if search_query %}&q={{ search_query }}{% endif %}"
+                    class="btn btn-sm rounded-pill px-3 {% if current_status == 'Clean' %}btn-success{% else %}btn-outline-success{% endif %}">
+                    Clean
+                </a>
+                <a href="{% url 'webadmin:view_reports' %}?status=Moderately Clean{% if search_query %}&q={{ search_query }}{% endif %}"
+                    class="btn btn-sm rounded-pill px-3 {% if current_status == 'Moderately Clean' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+                    Moderate
+                </a>
+                <a href="{% url 'webadmin:view_reports' %}?status=Dirty{% if search_query %}&q={{ search_query }}{% endif %}"
+                    class="btn btn-sm rounded-pill px-3 {% if current_status == 'Dirty' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                    Dirty
+                </a>
+            </div>
         </div>
     </div>
 
@@ -94,7 +111,8 @@
                             style="width: 80px; height: 80px; background: rgba(148, 163, 184, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
                             <i class="fas fa-folder-open" style="font-size: 2.5rem; color: #94a3b8;"></i>
                         </div>
-                        <h5 style="color: var(--text-main); font-weight: 700; margin-bottom: 0.5rem;">No reports found</h5>
+                        <h5 style="color: var(--text-main); font-weight: 700; margin-bottom: 0.5rem;">No reports found
+                        </h5>
                         <p style="color: #64748b; margin: 0;">Try adjusting the filters.</p>
                     </td>
                 </tr>
