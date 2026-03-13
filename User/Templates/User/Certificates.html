@@ -220,21 +220,123 @@
         color: var(--primary);
         margin-bottom: 1.5rem;
     }
+
+    /* Warning Tab Styles */
+    .reports-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(201, 169, 97, 0.1);
+        margin-bottom: 2rem;
+    }
+    .reports-table th {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        padding: 1.25rem 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .reports-table td {
+        padding: 1.5rem 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        font-size: 1rem;
+        vertical-align: middle;
+        color: var(--dark);
+    }
+    .reports-table tr:last-child td {
+        border-bottom: none;
+    }
+    .reports-table tr:hover {
+        background: rgba(201, 169, 97, 0.03);
+    }
+    .status-dirty {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+    }
+    .status-moderate {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+    }
+    .btn-view-pdf {
+        background: white;
+        border: 2px solid var(--primary);
+        color: var(--primary);
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    .btn-view-pdf:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+    }
+    .btn-view-pdf.disabled {
+        border-color: #ccc;
+        color: #ccc;
+        pointer-events: none;
+    }
+    /* Tab pill overrides */
+    .nav-pills .nav-link {
+        border: 2px solid var(--primary);
+        color: var(--primary);
+        opacity: 0.8;
+        transition: all 0.3s ease;
+    }
+    .nav-pills .nav-link:hover {
+        background: rgba(201, 169, 97, 0.1);
+        opacity: 1;
+    }
+    .nav-pills .nav-link.active {
+        background: var(--primary);
+        color: white;
+        opacity: 1;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="page-header" data-aos="fade-up">
-        <h1 class="page-title">My Certificates</h1>
-        <p class="page-subtitle">View and download your hygiene certificates</p>
+        <h1 class="page-title">My Documents</h1>
+        <p class="page-subtitle">View your hygiene certificates and violation alerts</p>
     </div>
+
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-pills mb-5 justify-content-center" id="docTabs" role="tablist" data-aos="fade-up">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active rounded-pill px-4 fw-bold mx-2" id="certificates-tab" data-bs-toggle="pill" data-bs-target="#certificatesPane" type="button" role="tab" aria-controls="certificatesPane" aria-selected="true">
+                <i class="fas fa-certificate me-2"></i> Certificates
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4 fw-bold mx-2" id="warnings-tab" data-bs-toggle="pill" data-bs-target="#warningsPane" type="button" role="tab" aria-controls="warningsPane" aria-selected="false">
+                <i class="fas fa-exclamation-triangle me-2"></i> Violation Alerts
+            </button>
+        </li>
+    </ul>
 
     <div class="mb-4" data-aos="fade-up">
         <a href="/User/homepage/" class="btn-back">
             <i class="fas fa-arrow-left"></i> Back to Dashboard
         </a>
     </div>
+
+    <!-- Tabs Content -->
+    <div class="tab-content" id="docTabsContent">
+        <!-- Certificates Tab -->
+        <div class="tab-pane fade show active" id="certificatesPane" role="tabpanel" aria-labelledby="certificates-tab" tabindex="0">
 
     {% if certificates %}
     <div class="cert-grid">
@@ -289,11 +391,61 @@
         <h3 style="color: var(--dark); margin-bottom: 1rem;">No Certificates Yet</h3>
         <p style="color: #6C757D; margin-bottom: 2rem;">You haven't earned any certificates yet. Upload kitchen images
             for inspection to get certified!</p>
-        <a href="/User/certificate/" class="btn-download" style="max-width: 300px; margin: 0 auto;">
-            <i class="fas fa-camera"></i>
-            Start New Scan
+        <a href="/User/certificates/" class="btn-download" style="max-width: 300px; margin: 0 auto;">
+            <i class="fas fa-certificate"></i>
+            Get Certificate
         </a>
     </div>
     {% endif %}
+        </div>
+
+        <!-- Warnings Tab -->
+        <div class="tab-pane fade" id="warningsPane" role="tabpanel" aria-labelledby="warnings-tab" tabindex="0">
+            {% if warnings %}
+            <div class="table-responsive">
+                <table class="reports-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%"><i class="far fa-calendar me-2"></i>Date</th>
+                            <th style="width: 35%"><i class="fas fa-info-circle me-2"></i>Hygiene Status</th>
+                            <th style="width: 40%"><i class="fas fa-file-alt me-2"></i>Report Document</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report in warnings %}
+                        <tr>
+                            <td><strong>{{ report.issue_date|date:"F d, Y" }}</strong></td>
+                            <td>
+                                <span class="status-badge {% if report.hygiene_status == 'Dirty' %}status-dirty{% else %}status-moderate{% endif %}">
+                                    <i class="fas fa-exclamation-circle"></i> {{ report.hygiene_status }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if report.pdf_file or report.hygiene_status %}
+                                <a href="/User/view-report/{{ report.id }}/" class="btn-view-pdf">
+                                    <i class="fas fa-eye"></i> View Report
+                                </a>
+                                {% else %}
+                                <span class="btn-view-pdf disabled">
+                                    <i class="fas fa-spinner fa-spin"></i> Generating...
+                                </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state" data-aos="fade-up">
+                <div class="empty-icon" style="color: var(--success); background: rgba(16, 185, 129, 0.1);">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 style="color: var(--dark); margin-bottom: 1rem;">No Violation Reports</h3>
+                <p style="color: #6C757D; margin-bottom: 2rem;">Great job! You have a clean track record.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endblock %}

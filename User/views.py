@@ -100,8 +100,12 @@ def view_all_certificates(request):
             cert.status = 'Expired'
             cert.save()
             
+    # Fetch warnings for the Warnings tab
+    warnings = HygieneViolation.objects.filter(hotel=hotel).order_by('-issue_date')
+            
     return render(request, 'User/Certificates.html', {
         'certificates': certificates,
+        'warnings': warnings,
         'hotel': hotel
     })
 
