@@ -1,0 +1,94 @@
+{% load static %}
+<div class="warning-preview-container">
+    <div class="alert alert-info border-0 shadow-sm mb-4" style="border-radius: 12px; background: #eff6ff; color: #1e40af;">
+        <i class="fas fa-info-circle me-2"></i>
+        <strong>Admin Preview:</strong> This is exactly how the structured PDF report will look for the hotel.
+    </div>
+
+    <!-- Structured Report Preview (Simplified for Modal) -->
+    <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 20px; font-family: 'Inter', sans-serif;">
+        <div class="p-4 bg-dark text-white d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="m-0 fw-bold" style="color: #c9a961;">RateMyKitchen</h5>
+                <small class="opacity-75">AI Hygiene Intelligence</small>
+            </div>
+            <div class="text-end">
+                <span class="badge bg-danger">HYGIENE VIOLATION</span>
+            </div>
+        </div>
+        
+        <div class="card-body p-4 bg-white">
+            <div class="mb-4">
+                <h6 class="text-uppercase fw-bold small text-muted border-bottom pb-2">Establishment Details</h6>
+                <div class="row mt-2">
+                    <div class="col-6">
+                        <label class="small text-muted d-block">Hotel</label>
+                        <span class="fw-bold">{{ hotel.hotel_name }}</span>
+                    </div>
+                    <div class="col-6">
+                        <label class="small text-muted d-block">Location</label>
+                        <span class="fw-bold">{{ hotel.hotel_address|default:"Not specified" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h6 class="text-uppercase fw-bold small text-muted border-bottom pb-2">Inspection Summary</h6>
+                <div class="row mt-2 align-items-center">
+                    <div class="col-6">
+                        <label class="small text-muted d-block">Status</label>
+                        <span class="badge {% if status == 'Dirty' %}bg-danger{% else %}bg-warning text-dark{% endif %} px-3 rounded-pill">
+                            {{ status }}
+                        </span>
+                    </div>
+                    <div class="col-4">
+                        <label class="small text-muted d-block">Date</label>
+                        <span class="fw-bold">{% now "F d, Y" %}</span>
+                    </div>
+                    <div class="col-4 text-end">
+                        <label class="small text-muted d-block">Time of Issue</label>
+                        <span class="fw-bold">{{ current_time|date:"h:i A" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h6 class="text-uppercase fw-bold small text-muted border-bottom pb-2">Violations Detected</h6>
+                <ul class="list-unstyled mt-2">
+                    {% for v in violations %}
+                    <li class="d-flex align-items-center mb-2 text-danger fw-bold small">
+                        <i class="fas fa-times-circle me-2"></i> {{ v }}
+                    </li>
+                    {% empty %}
+                    <li class="small text-muted">No specific violations listed</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="alert alert-warning border-0 rounded-3 mb-0 small">
+                <strong><i class="fas fa-lightbulb me-2"></i>Recommendation:</strong> 
+                Please perform a deep clean and schedule a re-inspection within 7 days.
+            </div>
+        </div>
+
+        <form action="{{ target_url }}" method="post" class="m-0">
+            {% csrf_token %}
+            <div class="p-4 bg-white border-top">
+                <label for="custom_message" class="form-label fw-bold small text-muted text-uppercase mb-2">Detailed Reason for Warning <span class="text-danger">*</span></label>
+                <textarea class="form-control rounded-3 mb-3" id="custom_message" name="custom_message" rows="3" placeholder="Provide a proper reason and specify the violation... e.g. Kitchen surfaces were contaminated." required></textarea>
+                
+                <label for="fine_amount" class="form-label fw-bold small text-muted text-uppercase mb-2">Fine Amount (₹)</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0">₹</span>
+                    <input type="number" class="form-control rounded-end-3" id="fine_amount" name="fine_amount" min="0" step="0.01" value="0.00" placeholder="Enter fine amount if applicable">
+                </div>
+            </div>
+            <div class="modal-footer bg-light border-0 p-3">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">
+                    <i class="fas fa-paper-plane me-2"></i>Send Official Warning
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

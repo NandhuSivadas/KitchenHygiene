@@ -3,6 +3,43 @@
 
 {% block page_title %}Public Violations{% endblock %}
 
+{% block extra_js %}
+<script>
+    document.querySelectorAll('.previewWarningBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const complaintId = this.getAttribute('data-complaint-id');
+            const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+            const contentDiv = document.getElementById('previewContent');
+
+            // Show loading
+            contentDiv.innerHTML = `
+                <div class="p-5 text-center">
+                    <div class="spinner-border text-primary mb-3"></div>
+                    <p class="text-muted">Preparing official report preview...</p>
+                </div>
+            `;
+            previewModal.show();
+
+            // Fetch preview
+            fetch(`/Admin/preview_warning_complaint/${complaintId}/`)
+                .then(response => response.text())
+                .then(html => {
+                    contentDiv.innerHTML = html;
+                })
+                .catch(err => {
+                    contentDiv.innerHTML = `
+                        <div class="p-5 text-center text-danger">
+                            <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+                            <p>Error loading preview. Please try again.</p>
+                            <button class="btn btn-sm btn-outline-danger mt-3" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    `;
+                });
+        });
+    });
+</script>
+{% endblock %}
+
 {% block content %}
 <!-- Stats Overview -->
 <div class="stats-grid">
@@ -146,10 +183,10 @@
                     <td>
                         <div class="dropdown">
                             <button class="icon-btn" style="width: 36px; height: 36px;" type="button"
-                                data-bs-toggle="dropdown">
+                                data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}'>
                                 <i class="fas fa-ellipsis-v"></i>
                             </button>
-                            <ul class="dropdown-menu border-0 shadow-lg p-2" style="border-radius: 12px;">
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-2" style="border-radius: 12px;">
                                 <li>
                                     <h6 class="dropdown-header text-uppercase small fw-bold">Actions</h6>
                                 </li>
@@ -161,6 +198,12 @@
                                     </button>
                                 </li>
                                 {% endif %}
+                                <li>
+                                    <a class="dropdown-item rounded-2 d-flex align-items-center gap-2 py-2 text-dark previewWarningBtn"
+                                        href="#" data-complaint-id="{{ complaint.id }}">
+                                        <i class="fas fa-exclamation-circle text-warning"></i> Send Warning
+                                    </a>
+                                </li>
                                 <li>
                                     <a class="dropdown-item rounded-2 d-flex align-items-center gap-2 py-2 text-success"
                                         href="{% url 'webadmin:admin_upload_image' complaint.hotel.id %}">
@@ -175,6 +218,7 @@
                                 </li>
                             </ul>
                         </div>
+
 
                     </td>
                 </tr>
@@ -194,7 +238,6 @@
     </div>
 </div>
 
-<!-- Modals -->
 {% for complaint in complaints %}
 {% if complaint.description %}
 <div class="modal fade" id="descModal{{ complaint.id }}" tabindex="-1">
@@ -211,18 +254,50 @@
     </div>
 </div>
 {% endif %}
+
 {% endfor %}
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; overflow: hidden;">
+            <div id="previewContent">
+                <div class="p-5 text-center">
+                    <div class="spinner-border text-primary mb-3"></div>
+                    <p class="text-muted">Preparing official report preview...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <style>
-    /* Additional Styles if specific to this page */
-    .status-warning {
-        background: rgba(245, 158, 11, 0.15);
-        color: var(--warning);
+    /* Fix clipping issues for dropdowns in tables */
+    .section-card {
+        overflow: visible !important;
     }
-
-    .status-warning::before {
-        background: var(--warning);
+    .custom-table-container {
+        overflow-x: auto !important;
+        margin-bottom: 20px;
+    }
+    .dropdown-menu {
+        z-index: 1060 !important;
+    }
+    /* Fixed stacking: earlier rows stay on top of later rows for dropdowns */
+    .custom-table tbody tr {
+        position: relative;
+        z-index: 1;
+    }
+    .custom-table tbody tr:hover,
+    .custom-table tbody tr:focus-within {
+        z-index: 20 !important;
+    }
+    /* Ensure the table container doesn't trap the menu */
+    .custom-table-container {
+        overflow-x: auto !important;
+        padding-bottom: 100px; /* Buffer for dropdown at the bottom */
+        margin-bottom: -80px;
     }
 </style>
 {% endblock %}

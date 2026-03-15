@@ -401,23 +401,24 @@
 
         <!-- Warnings Tab -->
         <div class="tab-pane fade" id="warningsPane" role="tabpanel" aria-labelledby="warnings-tab" tabindex="0">
-            {% if warnings %}
+            {% if ai_violations or hotel_warnings %}
             <div class="table-responsive">
                 <table class="reports-table">
                     <thead>
                         <tr>
                             <th style="width: 25%"><i class="far fa-calendar me-2"></i>Date</th>
-                            <th style="width: 35%"><i class="fas fa-info-circle me-2"></i>Hygiene Status</th>
-                            <th style="width: 40%"><i class="fas fa-file-alt me-2"></i>Report Document</th>
+                            <th style="width: 35%"><i class="fas fa-info-circle me-2"></i>Type / Status</th>
+                            <th style="width: 40%"><i class="fas fa-file-alt me-2"></i>Details / Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for report in warnings %}
+                        <!-- AI Violations -->
+                        {% for report in ai_violations %}
                         <tr>
-                            <td><strong>{{ report.issue_date|date:"F d, Y" }}</strong></td>
+                            <td><strong>{{ report.issue_date|date:"F d, Y" }} <br><small class="text-muted">{{ report.issue_date|date:"h:i A" }}</small></strong></td>
                             <td>
                                 <span class="status-badge {% if report.hygiene_status == 'Dirty' %}status-dirty{% else %}status-moderate{% endif %}">
-                                    <i class="fas fa-exclamation-circle"></i> {{ report.hygiene_status }}
+                                    <i class="fas fa-robot"></i> AI: {{ report.hygiene_status }}
                                 </span>
                             </td>
                             <td>
@@ -430,6 +431,43 @@
                                     <i class="fas fa-spinner fa-spin"></i> Generating...
                                 </span>
                                 {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                        <!-- Admin Warnings -->
+                        {% for warn in hotel_warnings %}
+                        <tr>
+                            <td><strong>{{ warn.created_at|date:"F d, Y" }} <br><small class="text-muted">{{ warn.created_at|date:"h:i A" }}</small></strong></td>
+                            <td>
+                                <span class="status-badge status-dirty">
+                                    <i class="fas fa-user-shield"></i> Admin Warning
+                                </span>
+                            </td>
+                            <td>
+                                <div class="p-3 border-start border-danger border-3 bg-light rounded shadow-sm d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <p class="mb-2 small fw-bold text-dark"><i class="fas fa-exclamation-triangle text-danger me-1"></i> {{ warn.message }}</p>
+                                        
+                                        {% if warn.photo_url %}
+                                    <div class="mt-3">
+                                        <span class="small text-muted d-block mb-2 fw-bold"><i class="fas fa-camera text-secondary me-1"></i> Violation Evidence:</span>
+                                        <img src="{{ warn.photo_url }}" alt="Violation Evidence" class="img-fluid rounded border" style="max-height: 150px; object-fit: cover; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                    </div>
+                                    {% elif warn.video_url %}
+                                    <div class="mt-3">
+                                        <span class="small text-muted d-block mb-2 fw-bold"><i class="fas fa-video text-secondary me-1"></i> Violation Evidence:</span>
+                                        <a href="{{ warn.video_url }}" target="_blank" class="btn btn-sm btn-outline-danger shadow-sm rounded-pill"><i class="fas fa-play me-1"></i> View Video Evidence</a>
+                                    {% endif %}
+                                    </div>
+                                    {% if warn.fine_amount > 0 %}
+                                    <div class="ms-3 text-end">
+                                        <span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm" style="font-size: 0.85rem;">
+                                            <i class="fas fa-rupee-sign me-1"></i> Fine: {{ warn.fine_amount }}
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}

@@ -232,14 +232,39 @@
     .notice-box {
         background: rgba(239, 68, 68, 0.06);
         border: 1px solid rgba(239, 68, 68, 0.2);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1.25rem;
+        align-items: flex-start;
+    }
+
+    .notice-icon {
+        width: 48px;
+        height: 48px;
+        background: #fee2e2;
+        color: #ef4444;
         border-radius: 12px;
-        padding: 1rem 1.2rem;
-        margin-bottom: 1.5rem;
-        font-size: 0.9rem;
-        color: #991b1b;
         display: flex;
         align-items: center;
-        gap: 0.6rem;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .notice-title {
+        color: #991b1b;
+        font-weight: 800;
+        margin-bottom: 0.25rem;
+        font-size: 1.1rem;
+    }
+
+    .notice-text {
+        color: #7f1d1d;
+        margin: 0;
+        font-size: 0.95rem;
+        line-height: 1.5;
     }
 </style>
 {% endblock %}
@@ -259,7 +284,7 @@
         <div class="report-banner">
             <div>
                 <h2><i class="fas fa-file-alt me-2"></i>Hygiene Violation Report</h2>
-                <div class="report-id">Report&nbsp;#{{ report.id }} &nbsp;|&nbsp; {{ report.issue_date|date:"F d, Y" }}
+                <div class="report-id">Report&nbsp;#{{ report.id }} &nbsp;|&nbsp; {{ report.issue_date|date:"F d, Y" }} at {{ report.issue_date|date:"h:i A" }}
                 </div>
             </div>
             <div class="brand-logo">
@@ -273,9 +298,16 @@
 
             {% if report.hygiene_status == 'Dirty' %}
             <div class="notice-box">
-                <i class="fas fa-exclamation-triangle"></i>
-                <strong>Immediate action required.</strong>&nbsp; This kitchen was classified as <strong>Dirty</strong>.
-                Please address all violations before resuming full operations.
+                <div class="notice-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="notice-content">
+                    <h5 class="notice-title">Immediate Action Required</h5>
+                    <p class="notice-text">
+                        This kitchen has been classified as <strong class="text-danger">Dirty</strong>. 
+                        Please address all hygiene violations immediately to ensure public safety and compliance.
+                    </p>
+                </div>
             </div>
             {% endif %}
 
@@ -287,7 +319,7 @@
                 </div>
                 <div class="info-item">
                     <div class="label"><i class="far fa-calendar me-1"></i>Issue Date</div>
-                    <div class="value">{{ report.issue_date|date:"F d, Y" }}</div>
+                    <div class="value">{{ report.issue_date|date:"F d, Y" }} at {{ report.issue_date|date:"h:i A" }}</div>
                 </div>
                 <div class="info-item">
                     <div class="label"><i class="fas fa-map-marker-alt me-1"></i>Address</div>
@@ -304,6 +336,10 @@
                             {{ report.hygiene_status }}
                         </span>
                     </div>
+                </div>
+                <div class="info-item">
+                    <div class="label"><i class="fas fa-rupee-sign me-1"></i>Penalty Fine</div>
+                    <div class="value text-danger" style="font-size: 1.2rem;">₹ {{ report.fine_amount|default:"0.00" }}</div>
                 </div>
             </div>
 

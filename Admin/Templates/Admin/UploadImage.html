@@ -326,11 +326,11 @@
                             {% endfor %}
                         </ul>
 
-                        <a href="{% url 'webadmin:generate_certificate' hotel.id %}"
-                            class="btn btn-outline-danger w-100 rounded-pill mt-3">
+                        <button type="button" class="btn btn-outline-danger w-100 rounded-pill mt-3" 
+                            id="previewWarningBtn" data-hotel-id="{{ hotel.id }}">
                             <i class="fas fa-envelope me-2"></i>
-                            Send Official Warning
-                        </a>
+                            Preview & Send Warning
+                        </button>
                         {% endif %}
 
                     </div>
@@ -341,4 +341,36 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div id="previewContent">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 text-muted">Generating preview...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('previewWarningBtn')?.addEventListener('click', function() {
+    const hotelId = this.getAttribute('data-hotel-id');
+    const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+    const content = document.getElementById('previewContent');
+    
+    modal.show();
+    
+    fetch(`/Admin/preview_warning/${hotelId}/`)
+    .then(response => response.text())
+    .then(html => {
+        content.innerHTML = html;
+    })
+    .catch(err => {
+        content.innerHTML = `<div class="alert alert-danger">Error loading preview: ${err}</div>`;
+    });
+});
+</script>
 {% endblock %}

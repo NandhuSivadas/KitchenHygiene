@@ -18,6 +18,9 @@ urlpatterns = [
     path('public-complaints/', views.view_public_complaints, name='view_public_complaints'),
     path('delete-public-complaint/<int:complaint_id>/', views.delete_public_complaint, name='delete_public_complaint'),
     path('export-complaints/', views.export_complaints, name='export_complaints'),
-
-
+    path('send_warning/<int:complaint_id>/', views.send_warning, name='send_warning'),
+    path('preview_warning/<int:hotel_id>/', views.preview_warning, name='preview_warning'),
+    path('preview_warning_complaint/<int:complaint_id>/', views.preview_warning, name='preview_warning_complaint'),
+    path('send_official_warning/<int:hotel_id>/', views.send_official_warning, name='send_official_warning'),
+    path('send_official_warning_complaint/<int:complaint_id>/', views.send_official_warning, name='send_official_warning_complaint'),
 ]

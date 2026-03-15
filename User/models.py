@@ -50,6 +50,7 @@ class KitchenImage(models.Model):
 
 class CustomerReview(models.Model):
     hotel      = models.ForeignKey(tbl_hotel, on_delete=models.CASCADE)
+    customer_name = models.CharField(max_length=100, default="Anonymous Guest", blank=True)
     rating     = models.PositiveSmallIntegerField()
     review     = models.TextField(blank=True)
     timestamp  = models.DateTimeField(auto_now_add=True)
@@ -82,9 +83,11 @@ class UploadModel(models.Model):
 
 class HygieneViolation(models.Model):
     hotel = models.ForeignKey(tbl_hotel, on_delete=models.CASCADE)
-    issue_date = models.DateField(auto_now_add=True)
+    issue_date = models.DateTimeField(auto_now_add=True)
     hygiene_status = models.CharField(max_length=50)  # "Dirty" or "Moderately Clean"
+    complaint = models.ForeignKey('PublicComplaint', on_delete=models.CASCADE, null=True, blank=True)
     pdf_file = models.FileField(upload_to='violation_reports/', null=True, blank=True)
+    fine_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def __str__(self):
         return f"{self.hotel.hotel_name} - {self.hygiene_status}"
@@ -103,3 +106,15 @@ class PublicComplaint(models.Model):
     
     def __str__(self):
         return f"Complaint against {self.hotel.hotel_name} - {self.priority}"
+
+class HotelWarning(models.Model):
+    hotel = models.ForeignKey(tbl_hotel, on_delete=models.CASCADE)
+    complaint = models.ForeignKey(PublicComplaint, on_delete=models.CASCADE, null=True, blank=True)
+    violation = models.ForeignKey(HygieneViolation, on_delete=models.CASCADE, null=True, blank=True)
+    message = models.TextField()
+    fine_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Warning to {self.hotel.hotel_name} - {self.created_at}"

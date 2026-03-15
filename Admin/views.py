@@ -208,76 +208,130 @@ def download_report_pdf(request, hotel_id):
         return redirect('webadmin:view_reports')
 
 def _generate_pdf_file(hotel):
-    image_obj = UploadModel.objects.filter(hotel=hotel).order_by('-uploaded_at').first()
-    image_path = None
-    if image_obj and image_obj.image:
-        try:
-            image_path = image_obj.image.path
-        except ValueError:
-            pass
-
-    pdf_name = f"{hotel.hotel_name}_{hotel.hygiene_status}_Report.pdf"
+    """Generates a premium PDF using xhtml2pdf and a template"""
+    from django.template.loader import get_template
+    from io import BytesIO
+    import xhtml2pdf.pisa as pisa
+    from User.models import HygieneViolation, UploadModel
     
-    if hotel.hygiene_status == "Clean":
-        report_dir = settings.MEDIA_ROOT
-    else:
-        report_dir = os.path.join(settings.MEDIA_ROOT, "violation_reports")
-        
-    pdf_path = os.path.join(report_dir, pdf_name)
-
-    if report_dir:
-        os.makedirs(report_dir, exist_ok=True)
-
-    c = canvas.Canvas(pdf_path, pagesize=A4)
-    width, height = A4
-
-    c.setFont("Helvetica-Bold", 20)
-    c.drawString(100, 770, "Kitchen Hygiene Report")
-
-    c.setFont("Helvetica", 14)
-    c.drawString(100, 730, f"Hotel: {hotel.hotel_name}")
-    c.drawString(100, 710, f"Address: {hotel.hotel_address}")
-    c.drawString(100, 690, f"Hygiene Status: {hotel.hygiene_status}")
-    c.drawString(100, 670, f"Issued on: {datetime.today().strftime('%Y-%m-%d')}")
-
-    if hotel.hygiene_status == "Clean":
-        Certificate.objects.create(
+    # Get last upload for evidence/status
+    upload = UploadModel.objects.filter(hotel=hotel).order_by('-uploaded_at').first()
+    status = hotel.hygiene_status
+    
+    # We use the existing User template for consistency/premium look
+    template = get_template('User/ReportPDF.html')
+    
+    # Create a dummy report object if one doesn't exist yet for rendering
+    # or fetch the most recent one
+    report = HygieneViolation.objects.filter(hotel=hotel).order_by('-id').first()
+    
+    # Differentiate logic for Clean vs Dirty
+    if status == "Clean":
+        from User.models import Certificate
+        Certificate.objects.get_or_create(
             hotel=hotel,
-            valid_till=datetime.today() + timedelta(days=365)
+            defaults={'valid_till': datetime.today() + timedelta(days=365)}
         )
         hotel.certificate_generated = True
-        c.setFont("Helvetica-Bold", 16)
-        c.setFillColorRGB(0, 0.6, 0)
-        c.drawString(100, 640, "✅ Certified Clean! This kitchen meets hygiene standards.")
-        c.setFillColorRGB(0, 0, 0)
-    else:
-        c.setFont("Helvetica-Bold", 16)
-        c.setFillColorRGB(1, 0, 0)
-        c.drawString(100, 640, "⚠️ Hygiene Violation Detected!")
-        c.setFont("Helvetica", 14)
-        c.setFillColorRGB(0, 0, 0)
-        c.drawString(100, 620, "Please review and improve hygiene practices.")
+        hotel.save()
+        # For clean reports, we might use a different logic or template, 
+        # but for now we follow the existing flow.
+        
+    pdf_name = f"{hotel.hotel_name}_{status}_Report.pdf"
+    report_dir = settings.MEDIA_ROOT if status == "Clean" else os.path.join(settings.MEDIA_ROOT, "violation_reports")
+    os.makedirs(report_dir, exist_ok=True)
+    pdf_path = os.path.join(report_dir, pdf_name)
 
-        if image_path and os.path.exists(image_path):
-            try:
-                img = ImageReader(image_path)
-                c.drawImage(img, 100, 380, width=300, height=200)
-                c.drawString(100, 360, "Submitted Evidence:")
-            except:
-                c.drawString(100, 360, "⚠️ Image could not be displayed.")
-
-        HygieneViolation.objects.create(
-            hotel=hotel,
-            hygiene_status=hotel.hygiene_status,
-            pdf_file=f"violation_reports/{pdf_name}"
-        )
-
-    c.setFont("Helvetica", 12)
-    c.drawString(100, 150, "Issued by: Kitchen Hygiene Monitoring System")
-    c.showPage()
-    c.save()
-    hotel.save()
+    # Render HTML to PDF
+    context = {'report': report, 'hotel': hotel}
+    html = template.render(context)
+    
+    with open(pdf_path, "wb") as f:
+        pisa_status = pisa.CreatePDF(html, dest=f)
+    
+    if pisa_status.err:
+        return None
+        
+    if status != "Clean" and report:
+        report.pdf_file = f"violation_reports/{pdf_name}"
+        report.save()
+        
     return pdf_path
+
+def preview_warning(request, hotel_id=None, complaint_id=None):
+    """Renders HTML preview for the admin modal, supporting both manual inspections and complaints"""
+    from django.urls import reverse
+    if complaint_id:
+        complaint = get_object_or_404(PublicComplaint, id=complaint_id)
+        hotel = complaint.hotel
+        status = complaint.ai_status
+        violations = [complaint.description] if complaint.description else ["Publicly reported hygiene violation"]
+        target_url = reverse('webadmin:send_official_warning_complaint', kwargs={'complaint_id': complaint_id})
+    else:
+        hotel = get_object_or_404(tbl_hotel, id=hotel_id)
+        status = hotel.hygiene_status
+        violations = ["Kitchen surface contamination", "Improper waste disposal"] if status == "Dirty" else ["Minor cleaning required"]
+        target_url = reverse('webadmin:send_official_warning', kwargs={'hotel_id': hotel_id})
+    
+    context = {
+        'hotel': hotel,
+        'status': status,
+        'violations': violations,
+        'complaint_id': complaint_id,
+        'target_url': target_url,
+        'current_time': datetime.now()
+    }
+    return render(request, 'Admin/WarningPreview.html', context)
+
+def send_official_warning(request, hotel_id=None, complaint_id=None):
+    """Final step: Create Violation, Generate PDF, and notify user"""
+    if request.method == "POST":
+        complaint = None
+        if complaint_id:
+            complaint = get_object_or_404(PublicComplaint, id=complaint_id)
+            hotel = complaint.hotel
+        else:
+            hotel = get_object_or_404(tbl_hotel, id=hotel_id)
+        
+        # 1. Create the Violation Record
+        fine_amount = request.POST.get('fine_amount', '0.00')
+        if not fine_amount:
+            fine_amount = '0.00'
+            
+        violation_obj = HygieneViolation.objects.create(
+            hotel=hotel,
+            hygiene_status=complaint.ai_status if complaint else hotel.hygiene_status,
+            complaint=complaint,
+            fine_amount=fine_amount
+        )
+        
+        # 2. Generate the PDF
+        _generate_pdf_file(hotel)
+        
+        # 3. Create a HotelWarning notification
+        timestamp_str = datetime.now().strftime("%I:%M %p")
+        custom_message = request.POST.get('custom_message', '').strip()
+        
+        if custom_message:
+            msg = custom_message
+        else:
+            msg = f"Official Hygiene Warning Issued at {timestamp_str}. Status: {violation_obj.hygiene_status}. Please review the attached PDF report."
+            if complaint:
+                msg = f"Public Complaint Warning: {msg}"
+
+        HotelWarning.objects.create(
+            hotel=hotel,
+            violation=violation_obj,
+            complaint=complaint,
+            message=msg,
+            fine_amount=fine_amount
+        )
+        
+        messages.success(request, f"Official warning and PDF report sent to {hotel.hotel_name} successfully.")
+        
+    if complaint_id:
+        return redirect('webadmin:view_public_complaints')
+    return redirect('webadmin:dashboard')
 
 def generate_certificate(request, hotel_id):
     hotel = get_object_or_404(tbl_hotel, id=hotel_id)
@@ -427,3 +481,20 @@ def export_complaints(request):
         ])
 
     return response
+
+def send_warning(request, complaint_id):
+    if request.method == "POST":
+        complaint = get_object_or_404(PublicComplaint, id=complaint_id)
+        message_text = request.POST.get("warning_message")
+        
+        if message_text:
+            HotelWarning.objects.create(
+                hotel=complaint.hotel,
+                complaint=complaint,
+                message=message_text
+            )
+            messages.success(request, f"Warning message sent to {complaint.hotel.hotel_name}.")
+        else:
+            messages.error(request, "Warning message cannot be empty.")
+            
+    return redirect('webadmin:view_public_complaints')

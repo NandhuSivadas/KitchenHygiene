@@ -151,3 +151,51 @@ def report_violation(request):
 
     hotels = tbl_hotel.objects.filter(is_verified=1)
     return render(request, "Guest/ReportViolation.html", {'hotels': hotels})
+
+def view_hotels(request):
+    from django.db.models import Avg, Count, Q
+    query = request.GET.get('q', '')
+    
+    # Fetch verified hotels with filters and annotations
+    hotels = tbl_hotel.objects.filter(is_verified=1)
+    
+    if query:
+        hotels = hotels.filter(
+            Q(hotel_name__icontains=query) | 
+            Q(hotel_address__icontains=query)
+        )
+        
+    hotels = hotels.annotate(
+        avg_rating=Avg('customerreview__rating'),
+        review_count=Count('customerreview')
+    ).order_by('-avg_rating')
+    
+    # Process reviews for each hotel to display in the UI
+    for hotel in hotels:
+        hotel.latest_reviews = CustomerReview.objects.filter(hotel=hotel).order_by('-timestamp')[:5]
+        
+    return render(request, "Guest/Reviews.html", {'hotels': hotels})
+
+def submit_review(request):
+    if request.method == "POST":
+        hotel_id = request.POST.get('hotel_id')
+        name = request.POST.get('customer_name')
+        rating = request.POST.get('rating')
+        review_text = request.POST.get('review')
+        
+        hotel = get_object_or_404(tbl_hotel, id=hotel_id)
+        
+        if not name or name.strip() == "":
+            name = "Anonymous Guest"
+            
+        CustomerReview.objects.create(
+            hotel=hotel,
+            customer_name=name,
+            rating=rating,
+            review=review_text
+        )
+        
+        messages.success(request, f"Review submitted for {hotel.hotel_name}! Thank you for your feedback.")
+        return redirect('guest:view_hotels')
+    
+    return redirect('guest:view_hotels')

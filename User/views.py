@@ -42,18 +42,20 @@ def myprofile(request):
 
 
 def editprofile(request):
-    user = request.user  # or fetch from session if you’re using a custom login
+    hotel = _require_hotel(request)
+    if not hotel:
+        return redirect("guest:login")
     
     if request.method == 'POST':
-        user.hotel_name = request.POST['txt_name']
-        user.hotel_email = request.POST['txt_email']
-        user.hotel_contact = request.POST['txt_contact']
-        user.hotel_address = request.POST['txt_address']
-        user.save()
+        hotel.hotel_name = request.POST['txt_name']
+        hotel.hotel_email = request.POST['txt_email']
+        hotel.hotel_contact = request.POST['txt_contact']
+        hotel.hotel_address = request.POST['txt_address']
+        hotel.save()
         messages.success(request, "Profile updated successfully!")
         return redirect('webuser:myprofile')
     
-    return render(request, 'User/editprofile.html', {'user': user})
+    return render(request, 'User/editprofile.html', {'user': hotel})
 
 
 def changepassword(request):
@@ -101,11 +103,28 @@ def view_all_certificates(request):
             cert.save()
             
     # Fetch warnings for the Warnings tab
-    warnings = HygieneViolation.objects.filter(hotel=hotel).order_by('-issue_date')
+    ai_violations = HygieneViolation.objects.filter(hotel=hotel).order_by('-issue_date')
+    hotel_warnings = list(HotelWarning.objects.filter(hotel=hotel).order_by('-created_at'))
+    
+    for warn in hotel_warnings:
+        warn.photo_url = None
+        warn.video_url = None
+        if warn.complaint and warn.complaint.image:
+            warn.photo_url = warn.complaint.image.url
+        elif warn.complaint and warn.complaint.video:
+            warn.video_url = warn.complaint.video.url
+        else:
+            upload = UploadModel.objects.filter(hotel=hotel, uploaded_at__lte=warn.created_at).order_by('-uploaded_at').first()
+            if upload and upload.image:
+                warn.photo_url = upload.image.url
+            elif upload and upload.video:
+                warn.video_url = upload.video.url
+            
             
     return render(request, 'User/Certificates.html', {
         'certificates': certificates,
-        'warnings': warnings,
+        'ai_violations': ai_violations,
+        'hotel_warnings': hotel_warnings,
         'hotel': hotel
     })
 
