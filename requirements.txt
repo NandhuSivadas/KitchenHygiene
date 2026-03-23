@@ -1,0 +1,10 @@
+django
+ultralytics
+opencv-python
+numpy
+pandas
+seaborn
+matplotlib
+roboflow
+reportlab
+pillow

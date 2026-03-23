@@ -1,473 +1,200 @@
 {% extends "User/Header.html" %}
 
-{% block title %}My Certificates - RateMyKitchen{% endblock %}
+{% block title %}Documents - RateMyKitchen{% endblock %}
 
 {% block extra_styles %}
 <style>
-    .page-header {
-        text-align: center;
-        margin-bottom: 3rem;
-        padding-top: 2rem;
-    }
-
-    .page-title {
-        font-size: 3rem;
-        font-weight: 800;
-        background: linear-gradient(135deg, var(--dark), var(--primary));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin-bottom: 0.5rem;
-    }
-
-    .page-subtitle {
-        color: #6C757D;
-        font-size: 1.1rem;
-    }
-
-    .cert-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        gap: 2rem;
-        margin-bottom: 2rem;
-    }
-
-    .cert-card {
-        background: white;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-        border: 1px solid rgba(201, 169, 97, 0.1);
-        transition: all 0.4s ease;
-        position: relative;
-    }
-
-    .cert-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 6px;
-        background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-    }
-
-    .cert-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-    }
-
-    .cert-card-header {
-        padding: 2rem 2rem 1rem;
-        text-align: center;
-    }
-
-    .cert-icon {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 10px 25px rgba(201, 169, 97, 0.3);
-    }
-
-    .cert-number {
-        font-size: 0.85rem;
-        color: var(--text-secondary);
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.5rem;
-    }
-
-    .cert-title {
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: var(--dark);
-        margin-bottom: 1.5rem;
-    }
-
-    .cert-card-body {
-        padding: 0 2rem 1.5rem;
-    }
-
-    .cert-detail-item {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.75rem 0;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    }
-
-    .cert-detail-item:last-child {
-        border-bottom: none;
-    }
-
-    .cert-detail-icon {
-        color: var(--primary);
-        font-size: 1.1rem;
-        width: 20px;
-        text-align: center;
-    }
-
-    .cert-detail-text {
-        flex: 1;
-        font-size: 0.95rem;
-        color: var(--text-secondary);
-    }
-
-    .cert-detail-value {
-        font-weight: 600;
-        color: var(--dark);
-    }
-
-    .cert-card-footer {
-        padding: 1.5rem 2rem 2rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1.25rem;
-        border-radius: 50px;
-        font-size: 0.9rem;
-        font-weight: 700;
-        width: 100%;
-    }
-
-    .status-active {
-        background: rgba(16, 185, 129, 0.1);
-        color: var(--success);
-    }
-
-    .status-expired {
-        background: rgba(239, 68, 68, 0.1);
-        color: #ef4444;
-    }
-
-    .btn-download {
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: white;
-        border: none;
-        padding: 0.875rem 1.5rem;
-        border-radius: 12px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        width: 100%;
-    }
-
-    .btn-download:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(201, 169, 97, 0.3);
-        color: white;
-    }
-
-    .btn-download:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-
-    .btn-back {
-        background: white;
-        border: 2px solid var(--primary);
-        color: var(--primary);
-        padding: 0.75rem 1.5rem;
-        border-radius: 12px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .btn-back:hover {
-        background: var(--primary);
-        color: white;
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 4rem 2rem;
-        background: white;
-        border-radius: 20px;
-    }
-
-    .empty-icon {
-        width: 100px;
-        height: 100px;
-        background: rgba(201, 169, 97, 0.1);
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 3rem;
-        color: var(--primary);
-        margin-bottom: 1.5rem;
-    }
-
-    /* Warning Tab Styles */
-    .reports-table {
-        width: 100%;
-        border-collapse: collapse;
-        background: white;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-        border: 1px solid rgba(201, 169, 97, 0.1);
-        margin-bottom: 2rem;
-    }
-    .reports-table th {
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: white;
-        padding: 1.25rem 1rem;
-        text-align: left;
-        font-weight: 600;
-        font-size: 1rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    .reports-table td {
-        padding: 1.5rem 1rem;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        font-size: 1rem;
-        vertical-align: middle;
-        color: var(--dark);
-    }
-    .reports-table tr:last-child td {
-        border-bottom: none;
-    }
-    .reports-table tr:hover {
-        background: rgba(201, 169, 97, 0.03);
-    }
-    .status-dirty {
-        background: rgba(239, 68, 68, 0.1);
-        color: var(--danger);
-    }
-    .status-moderate {
-        background: rgba(245, 158, 11, 0.1);
-        color: var(--warning);
-    }
-    .btn-view-pdf {
-        background: white;
-        border: 2px solid var(--primary);
-        color: var(--primary);
-        padding: 0.5rem 1rem;
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: all 0.3s ease;
-    }
-    .btn-view-pdf:hover {
-        background: var(--primary);
-        color: white;
-        transform: translateY(-2px);
-    }
-    .btn-view-pdf.disabled {
-        border-color: #ccc;
-        color: #ccc;
-        pointer-events: none;
-    }
-    /* Tab pill overrides */
+    /* Tab Overrides */
     .nav-pills .nav-link {
-        border: 2px solid var(--primary);
-        color: var(--primary);
-        opacity: 0.8;
-        transition: all 0.3s ease;
+        color: var(--text-sub); border-radius: 12px; font-weight: 600; padding: 0.8rem 1.5rem;
+        transition: all 0.3s; margin-right: 0.5rem;
     }
-    .nav-pills .nav-link:hover {
-        background: rgba(201, 169, 97, 0.1);
-        opacity: 1;
-    }
+    .nav-pills .nav-link:hover { background: rgba(0,0,0,0.03); color: var(--dark); }
     .nav-pills .nav-link.active {
-        background: var(--primary);
-        color: white;
-        opacity: 1;
+        background: var(--dark) !important; color: white !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
+
+    /* Certificate Card Styling (Gold Card logic retained but frame simplified) */
+    .cert-card-premium {
+        background: white; border-radius: 20px; overflow: hidden;
+        border: 1px solid var(--border); box-shadow: var(--shadow-md);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%; position: relative;
+    }
+    .cert-card-premium:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: var(--primary-light); }
+    
+    .cert-banner-gold {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        height: 8px; width: 100%;
+    }
+
+    /* Table styling for Reports */
+    .premium-table { width: 100%; border-collapse: separate; border-spacing: 0 0.75rem; }
+    .premium-table th { color: var(--text-sub); font-size: 0.75rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; padding: 1rem 1.5rem; }
+    .premium-table tbody tr { background: white; transition: all 0.2s; }
+    .premium-table tbody tr td { padding: 1.5rem; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .premium-table tbody tr td:first-child { border-left: 1px solid var(--border); border-top-left-radius: 16px; border-bottom-left-radius: 16px; }
+    .premium-table tbody tr td:last-child { border-right: 1px solid var(--border); border-top-right-radius: 16px; border-bottom-right-radius: 16px; }
+    .premium-table tbody tr:hover td { background: #fdfdfd; border-color: var(--primary-light); }
+
+    .stamp { font-size: 0.8rem; font-weight: 700; padding: 0.4rem 1rem; border-radius: 50px; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .stamp-active { background: rgba(16,185,129,0.1); color: var(--success); }
+    .stamp-expired { background: rgba(239,68,68,0.1); color: var(--danger); }
+    .stamp-lock { background: #f1f5f9; color: #64748b; }
+
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="page-header" data-aos="fade-up">
-        <h1 class="page-title">My Documents</h1>
-        <p class="page-subtitle">View your hygiene certificates and violation alerts</p>
+<div class="page-banner">
+    <div class="container banner-content" data-aos="fade-up">
+        <h1 class="banner-title">My Documents</h1>
+        <p class="banner-subtitle">Manage your certificates and view historical reports</p>
+    </div>
+</div>
+
+<div class="container" style="margin-top: -3rem; position: relative; z-index: 5;">
+    <!-- Tab Navigation -->
+    <div class="clean-card mb-4" style="padding: 1.25rem;">
+        <ul class="nav nav-pills" id="pills-tab" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" id="pills-certificates-tab" data-bs-toggle="pill" data-bs-target="#pills-certificates">
+                    <i class="fas fa-certificate me-2"></i> Certificates
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="pills-warnings-tab" data-bs-toggle="pill" data-bs-target="#pills-warnings">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Violation Alerts
+                </button>
+            </li>
+        </ul>
     </div>
 
-    <!-- Tabs Navigation -->
-    <ul class="nav nav-pills mb-5 justify-content-center" id="docTabs" role="tablist" data-aos="fade-up">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active rounded-pill px-4 fw-bold mx-2" id="certificates-tab" data-bs-toggle="pill" data-bs-target="#certificatesPane" type="button" role="tab" aria-controls="certificatesPane" aria-selected="true">
-                <i class="fas fa-certificate me-2"></i> Certificates
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link rounded-pill px-4 fw-bold mx-2" id="warnings-tab" data-bs-toggle="pill" data-bs-target="#warningsPane" type="button" role="tab" aria-controls="warningsPane" aria-selected="false">
-                <i class="fas fa-exclamation-triangle me-2"></i> Violation Alerts
-            </button>
-        </li>
-    </ul>
-
-    <div class="mb-4" data-aos="fade-up">
-        <a href="/User/homepage/" class="btn-back">
-            <i class="fas fa-arrow-left"></i> Back to Dashboard
-        </a>
-    </div>
-
-    <!-- Tabs Content -->
-    <div class="tab-content" id="docTabsContent">
+    <div class="tab-content" id="pills-tabContent">
         <!-- Certificates Tab -->
-        <div class="tab-pane fade show active" id="certificatesPane" role="tabpanel" aria-labelledby="certificates-tab" tabindex="0">
+        <div class="tab-pane fade show active" id="pills-certificates">
+            {% if certificates %}
+            <div class="row g-4">
+                {% for cert in certificates %}
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+                    <div class="cert-card-premium">
+                        <div class="cert-banner-gold"></div>
+                        <div style="padding: 2rem;">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div style="width: 54px; height: 54px; background: rgba(201,169,97,0.1); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--primary-dark); font-size: 1.5rem;">
+                                    <i class="fas fa-certificate"></i>
+                                </div>
+                                <span class="stamp {% if cert.status == 'Active' %}stamp-active{% elif cert.status == 'Deactivated' %}stamp-lock{% else %}stamp-expired{% endif %}">
+                                    <i class="fas fa-{% if cert.status == 'Active' %}check-circle{% elif cert.status == 'Deactivated' %}lock{% else %}times-circle{% endif %}"></i>
+                                    {{ cert.status }}
+                                </span>
+                            </div>
 
-    {% if certificates %}
-    <div class="cert-grid">
-        {% for cert in certificates %}
-        <div class="cert-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:100 }}">
-            <div class="cert-card-header">
-                <div class="cert-icon">
+                            <p style="font-size: 0.72rem; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Certified Excellence</p>
+                            <h4 style="font-size: 1.25rem; font-weight: 800; color: var(--dark); margin-bottom: 1.5rem;">Certificate #{{ cert.certificate_number }}</h4>
+
+                            <div style="background: #f8fafc; border-radius: 12px; padding: 1.25rem; margin-bottom: 2rem;">
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <div style="font-size: 0.65rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">Issued On</div>
+                                        <div style="font-size: 0.88rem; font-weight: 600;">{{ cert.issue_date|date:"d M Y" }}</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div style="font-size: 0.65rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">Valid Till</div>
+                                        <div style="font-size: 0.88rem; font-weight: 600;">{{ cert.valid_till|date:"d M Y" }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if cert.status == 'Deactivated' %}
+                                <button class="btn w-100 py-3 disabled" style="background: #f1f5f9; color: #94a3b8; border-radius: 12px; font-weight: 700; border: none;">
+                                    <i class="fas fa-lock me-2"></i> Access Disabled
+                                </button>
+                            {% elif cert.file %}
+                                <a href="/User/download-certificate/{{ cert.id }}/" class="btn w-100 py-3" style="background: var(--dark); color: white; border-radius: 12px; font-weight: 700; transition: all 0.3s;">
+                                    <i class="fas fa-download me-2"></i> Download PDF
+                                </a>
+                            {% else %}
+                                <div class="btn w-100 py-3 disabled" style="background: #f1f5f9; color: #94a3b8; border-radius: 12px; font-weight: 700; border: none;">
+                                    Processing...
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <div style="width: 100px; height: 100px; background: rgba(0,0,0,0.03); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 3rem; color: #cbd5e1; margin-bottom: 1.5rem;">
                     <i class="fas fa-certificate"></i>
                 </div>
-                <div class="cert-number">Certificate #{{ cert.certificate_number }}</div>
-                <h3 class="cert-title">Hygiene Excellence Certificate</h3>
+                <h3>No Certificates Yet</h3>
+                <p class="text-muted">Once your kitchen is inspected and approved, certificates will appear here.</p>
             </div>
-
-            <div class="cert-card-body">
-                <div class="cert-detail-item">
-                    <i class="far fa-calendar cert-detail-icon"></i>
-                    <span class="cert-detail-text">Issued</span>
-                    <span class="cert-detail-value">{{ cert.issue_date|date:"M d, Y" }}</span>
-                </div>
-                <div class="cert-detail-item">
-                    <i class="far fa-calendar-check cert-detail-icon"></i>
-                    <span class="cert-detail-text">Valid Until</span>
-                    <span class="cert-detail-value">{{ cert.valid_till|date:"M d, Y" }}</span>
-                </div>
-            </div>
-
-            <div class="cert-card-footer">
-                <span
-                    class="status-badge {% if cert.status == 'Active' %}status-active{% else %}status-expired{% endif %}">
-                    <i class="fas fa-{% if cert.status == 'Active' %}check-circle{% else %}times-circle{% endif %}"></i>
-                    {{ cert.status }}
-                </span>
-
-                {% if cert.file %}
-                <a href="/User/download-certificate/{{ cert.id }}/" class="btn-download">
-                    <i class="fas fa-download"></i> Download PDF
-                </a>
-                {% else %}
-                <button class="btn-download" disabled>
-                    <i class="fas fa-hourglass-half"></i> Generating...
-                </button>
-                {% endif %}
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty-state" data-aos="fade-up">
-        <div class="empty-icon">
-            <i class="fas fa-certificate"></i>
-        </div>
-        <h3 style="color: var(--dark); margin-bottom: 1rem;">No Certificates Yet</h3>
-        <p style="color: #6C757D; margin-bottom: 2rem;">You haven't earned any certificates yet. Upload kitchen images
-            for inspection to get certified!</p>
-        <a href="/User/certificates/" class="btn-download" style="max-width: 300px; margin: 0 auto;">
-            <i class="fas fa-certificate"></i>
-            Get Certificate
-        </a>
-    </div>
-    {% endif %}
+            {% endif %}
         </div>
 
-        <!-- Warnings Tab -->
-        <div class="tab-pane fade" id="warningsPane" role="tabpanel" aria-labelledby="warnings-tab" tabindex="0">
+        <!-- Violation Alerts Tab -->
+        <div class="tab-pane fade" id="pills-warnings">
             {% if ai_violations or hotel_warnings %}
             <div class="table-responsive">
-                <table class="reports-table">
+                <table class="premium-table">
                     <thead>
                         <tr>
-                            <th style="width: 25%"><i class="far fa-calendar me-2"></i>Date</th>
-                            <th style="width: 35%"><i class="fas fa-info-circle me-2"></i>Type / Status</th>
-                            <th style="width: 40%"><i class="fas fa-file-alt me-2"></i>Details / Action</th>
+                            <th>Issue Date</th>
+                            <th>Verification Source</th>
+                            <th>Message / Detail</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- AI Violations -->
                         {% for report in ai_violations %}
-                        <tr>
-                            <td><strong>{{ report.issue_date|date:"F d, Y" }} <br><small class="text-muted">{{ report.issue_date|date:"h:i A" }}</small></strong></td>
+                        <tr data-aos="fade-up">
+                            <td style="font-weight: 600;">{{ report.issue_date|date:"d M Y" }}</td>
                             <td>
-                                <span class="status-badge {% if report.hygiene_status == 'Dirty' %}status-dirty{% else %}status-moderate{% endif %}">
-                                    <i class="fas fa-robot"></i> AI: {{ report.hygiene_status }}
+                                <div class="d-flex align-items-center gap-2">
+                                    <div style="width: 32px; height: 32px; background: rgba(59,130,246,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #3b82f6;">
+                                        <i class="fas fa-robot"></i>
+                                    </div>
+                                    <span style="font-weight: 600;">AI Inspection</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span style="background: {% if report.hygiene_status == 'Dirty' %}rgba(239,68,68,0.1); color: #ef4444;{% else %}rgba(245,158,11,0.1); color: #f59e0b;{% endif %} padding: 0.3rem 0.8rem; border-radius: 50px; font-weight: 700; font-size: 0.8rem;">
+                                    {{ report.hygiene_status }} Status Detected
                                 </span>
                             </td>
                             <td>
-                                {% if report.pdf_file or report.hygiene_status %}
-                                <a href="/User/view-report/{{ report.id }}/" class="btn-view-pdf">
-                                    <i class="fas fa-eye"></i> View Report
+                                <a href="/User/view-report/{{ report.id }}/" style="color: var(--primary-dark); font-weight: 700; text-decoration: none; font-size: 0.9rem;">
+                                    View Detail <i class="fas fa-chevron-right ms-1" style="font-size: 0.7rem;"></i>
                                 </a>
-                                {% else %}
-                                <span class="btn-view-pdf disabled">
-                                    <i class="fas fa-spinner fa-spin"></i> Generating...
-                                </span>
-                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}
 
-                        <!-- Admin Warnings -->
                         {% for warn in hotel_warnings %}
-                        <tr>
-                            <td><strong>{{ warn.created_at|date:"F d, Y" }} <br><small class="text-muted">{{ warn.created_at|date:"h:i A" }}</small></strong></td>
+                        <tr data-aos="fade-up">
+                            <td style="font-weight: 600;">{{ warn.created_at|date:"d M Y" }}</td>
                             <td>
-                                <span class="status-badge status-dirty">
-                                    <i class="fas fa-user-shield"></i> Admin Warning
-                                </span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div style="width: 32px; height: 32px; background: rgba(239,68,68,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #ef4444;">
+                                        <i class="fas fa-user-shield"></i>
+                                    </div>
+                                    <span style="font-weight: 600;">Official Warning</span>
+                                </div>
+                            </td>
+                            <td style="max-width: 400px; font-size: 0.9rem; color: var(--text-sub); line-height: 1.5;">
+                                <strong class="text-dark d-block mb-1">{{ warn.message }}</strong>
+                                {% if warn.fine_amount > 0 %} <span class="badge bg-danger rounded-pill">Fine: ₹{{ warn.fine_amount }}</span> {% endif %}
                             </td>
                             <td>
-                                <div class="p-3 border-start border-danger border-3 bg-light rounded shadow-sm d-flex justify-content-between align-items-start">
-                                    <div class="flex-grow-1">
-                                        <p class="mb-2 small fw-bold text-dark"><i class="fas fa-exclamation-triangle text-danger me-1"></i> {{ warn.message }}</p>
-                                        
-                                        {% if warn.photo_url %}
-                                    <div class="mt-3">
-                                        <span class="small text-muted d-block mb-2 fw-bold"><i class="fas fa-camera text-secondary me-1"></i> Violation Evidence:</span>
-                                        <img src="{{ warn.photo_url }}" alt="Violation Evidence" class="img-fluid rounded border" style="max-height: 150px; object-fit: cover; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                                    </div>
-                                    {% elif warn.video_url %}
-                                    <div class="mt-3">
-                                        <span class="small text-muted d-block mb-2 fw-bold"><i class="fas fa-video text-secondary me-1"></i> Violation Evidence:</span>
-                                        <a href="{{ warn.video_url }}" target="_blank" class="btn btn-sm btn-outline-danger shadow-sm rounded-pill"><i class="fas fa-play me-1"></i> View Video Evidence</a>
-                                    {% endif %}
-                                    </div>
-                                    {% if warn.fine_amount > 0 %}
-                                    <div class="ms-3 text-end">
-                                        <span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm" style="font-size: 0.85rem;">
-                                            <i class="fas fa-rupee-sign me-1"></i> Fine: {{ warn.fine_amount }}
-                                        </span>
-                                    </div>
-                                    {% endif %}
-                                </div>
+                                {% if warn.photo_url %}
+                                    <a href="{{ warn.photo_url }}" target="_blank" style="color: var(--danger); font-weight: 700; text-decoration: none; font-size: 0.9rem;">
+                                        View Proof <i class="fas fa-image ms-1"></i>
+                                    </a>
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}
@@ -475,12 +202,12 @@
                 </table>
             </div>
             {% else %}
-            <div class="empty-state" data-aos="fade-up">
-                <div class="empty-icon" style="color: var(--success); background: rgba(16, 185, 129, 0.1);">
-                    <i class="fas fa-check-circle"></i>
+            <div class="text-center py-5">
+                <div style="width: 100px; height: 100px; background: rgba(16,185,129,0.05); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 3rem; color: #bbf7d0; margin-bottom: 1.5rem;">
+                    <i class="fas fa-check-shield"></i>
                 </div>
-                <h3 style="color: var(--dark); margin-bottom: 1rem;">No Violation Reports</h3>
-                <p style="color: #6C757D; margin-bottom: 2rem;">Great job! You have a clean track record.</p>
+                <h3>All Clear</h3>
+                <p class="text-muted">You have no recorded violations or warnings. Keep up the high standards!</p>
             </div>
             {% endif %}
         </div>

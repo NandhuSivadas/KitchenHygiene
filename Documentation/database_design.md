@@ -57,8 +57,8 @@ erDiagram
     UPLOAD_MODEL {
         int id PK
         int hotel_id FK
-        string image
-        string video
+        ImageField image
+        FileField video
         datetime uploaded_at
         string hygiene_status
     }

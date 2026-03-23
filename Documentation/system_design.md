@@ -232,8 +232,9 @@ classDiagram
     }
 
     class UploadModel {
-        +Image image
-        +Video video
+        +ForeignKey hotel
+        +ImageField image
+        +FileField video
         +DateTime uploaded_at
         +String hygiene_status
     }

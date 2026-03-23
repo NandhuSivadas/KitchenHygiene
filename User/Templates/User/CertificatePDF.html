@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hygiene Excellence Certificate</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 1cm;
+        }
+        body {
+            font-family: "Times New Roman", Times, serif;
+            color: #1a1a2e;
+        }
+        .cert-outer {
+            width: 100%;
+            height: 100%;
+            border: 8px solid #c9a961;
+            padding: 10px;
+        }
+        .cert-inner {
+            width: 100%;
+            height: 100%;
+            border: 2px solid #1a1a2e;
+            background-color: #faf9f5;
+        }
+        .content-cell {
+            text-align: center;
+            vertical-align: middle;
+            padding: 40px;
+        }
+        .brand {
+            color: #c9a961;
+            font-size: 28pt;
+            font-weight: bold;
+            font-family: Helvetica, sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 4pt;
+            margin-bottom: 25pt;
+        }
+        .title {
+            font-size: 54pt;
+            font-weight: bold;
+            color: #1a1a2e;
+            text-transform: uppercase;
+            letter-spacing: 3pt;
+            margin-bottom: 15pt;
+        }
+        .subtitle {
+            font-size: 24pt;
+            color: #555;
+            font-style: italic;
+            margin-bottom: 50pt;
+        }
+        .hotel-name {
+            font-size: 48pt;
+            font-weight: bold;
+            color: #c9a961;
+            margin-bottom: 10pt;
+        }
+        .hotel-line-container {
+            margin-bottom: 40pt;
+        }
+        .hotel-line {
+            border-bottom: 3pt solid #c9a961;
+            width: 70%;
+            margin: 0 auto;
+        }
+        .text {
+            font-size: 22pt;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 50pt;
+        }
+        .details {
+            width: 80%;
+            margin: 0 auto;
+            font-size: 18pt;
+            font-family: Helvetica, sans-serif;
+            margin-bottom: 60pt;
+        }
+        .details td {
+            padding: 10pt 0;
+            border-bottom: 1pt dashed #ccc;
+        }
+        .signatures {
+            width: 80%;
+            margin: 0 auto;
+        }
+        .sig-box {
+            width: 40%;
+            text-align: center;
+        }
+        .sig-line {
+            border-bottom: 1pt solid #1a1a2e;
+            margin-bottom: 5pt;
+            padding-bottom: 5pt;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 24pt;
+            font-weight: bold;
+            color: #1a1a2e;
+        }
+        .sig-spacer {
+            width: 20%;
+        }
+        .sig-label {
+            font-size: 16pt;
+            font-family: Helvetica, sans-serif;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <table width="100%" style="width: 100%; border: 12pt solid #c9a961;" cellpadding="0" cellspacing="0">
+        <tr>
+            <td width="100%" align="center" valign="middle"
+                style="width: 100%; padding: 20pt; border: 3pt solid #1a1a2e; background-color: #faf9f5; text-align: center;">
+
+                <div class="brand">RateMyKitchen</div>
+                <div class="title">Certificate of Excellence</div>
+                <div class="subtitle">Awarded for Outstanding Kitchen Hygiene Standard</div>
+
+                <div class="hotel-name">{{ hotel.hotel_name }}</div>
+                <div class="hotel-line-container">
+                    <div class="hotel-line"></div>
+                </div>
+
+                <div class="text">
+                    This certificate verifies that the aforementioned establishment is maintaining
+                    clean and safe food preparation environments, complying with all AI hygiene protocols.
+                </div>
+
+                <table width="80%" align="center" style="width: 80%; margin: 0 auto;" class="details" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td align="left" width="50%"><strong>Certificate No:</strong> {{ cert.certificate_number|default:cert.id }}</td>
+                        <td align="right" width="50%"><strong>Status:</strong> Active &amp; Verified</td>
+                    </tr>
+                    <tr>
+                        <td align="left"><strong>Issue Date:</strong> {{ cert.issue_date|date:"F d, Y" }}</td>
+                        <td align="right"><strong>Valid Until:</strong> {{ cert.valid_till|date:"F d, Y" }}</td>
+                    </tr>
+                </table>
+
+                <table width="80%" align="center" style="width: 80%; margin: 0 auto; margin-top: 1cm;" class="signatures" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td width="40%" style="text-align: center;">
+                            <div class="sig-line">AI Inspector</div>
+                            <div class="sig-label">Authorized Signature</div>
+                        </td>
+                        <td width="20%"></td>
+                        <td width="40%" style="text-align: center;">
+                            <div class="sig-line">RateMyKitchen</div>
+                            <div class="sig-label">Issuing Authority</div>
+                        </td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

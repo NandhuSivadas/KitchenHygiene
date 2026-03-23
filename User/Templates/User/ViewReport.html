@@ -1,374 +1,152 @@
 {% extends "User/Header.html" %}
 
-{% block title %}Violation Report #{{ report.id }} - RateMyKitchen{% endblock %}
+{% block title %}Report #{{ report.id }} - RateMyKitchen{% endblock %}
 
 {% block extra_styles %}
 <style>
-    .report-preview-container {
-        max-width: 860px;
-        margin: 3rem auto;
-        padding: 0 1rem;
+    .report-detail-card {
+        background: white; border-radius: 20px; overflow: hidden;
+        border: 1px solid var(--border); box-shadow: var(--shadow-lg);
+        position: relative; z-index: 5; margin-top: -3rem;
     }
-
-    /* ── Page Header ── */
-    .page-header {
-        text-align: center;
-        margin-bottom: 2.5rem;
+    .report-accent-bar {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        padding: 2.5rem; color: white;
     }
-
-    .page-title {
-        font-size: 2.6rem;
-        font-weight: 800;
-        background: linear-gradient(135deg, var(--dark), var(--primary));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin-bottom: 0.4rem;
+    .report-section { padding: 2.5rem; }
+    
+    .info-row {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 1.25rem 0; border-bottom: 1px solid #f1f5f9;
     }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { font-size: 0.75rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; }
+    .info-val { font-size: 1rem; font-weight: 700; color: var(--dark); }
 
-    .page-subtitle {
-        color: var(--text-secondary);
-        font-size: 1rem;
+    .status-pill-lg {
+        padding: 0.5rem 1.25rem; border-radius: 50px; font-weight: 800; font-size: 0.9rem;
+        display: inline-flex; align-items: center; gap: 0.5rem;
     }
+    .status-dirty { background: rgba(239,68,68,0.12); color: var(--danger); }
+    .status-moderate { background: rgba(245,158,11,0.12); color: var(--warning); }
+    .status-clean { background: rgba(16,185,129,0.12); color: var(--success); }
 
-    /* ── Report Card ── */
-    .report-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.10);
-        border: 1px solid rgba(201, 169, 97, 0.15);
-        overflow: hidden;
-        margin-bottom: 2rem;
+    .rec-card {
+        background: #f8fafc; border-radius: 16px; padding: 1.5rem;
+        border: 1px solid var(--border); margin-bottom: 1rem;
+        display: flex; gap: 1rem; align-items: flex-start;
     }
-
-    /* Branded top bar */
-    .report-banner {
-        background: linear-gradient(135deg, #1a1a2e 0%, #c9a961 100%);
-        padding: 2rem 2.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-
-    .report-banner h2 {
-        color: white;
-        font-size: 1.5rem;
-        font-weight: 800;
-        margin: 0;
-    }
-
-    .report-banner .report-id {
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 0.9rem;
-        margin-top: 0.3rem;
-    }
-
-    .brand-logo {
-        color: white;
-        font-size: 0.85rem;
-        opacity: 0.8;
-        text-align: right;
-    }
-
-    .brand-logo span {
-        font-weight: 700;
-        font-size: 1rem;
-        display: block;
-        opacity: 1;
-    }
-
-    /* Report body */
-    .report-body {
-        padding: 2.5rem;
-    }
-
-    /* Info grid */
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .info-item {
-        background: #f9f7f2;
-        border-radius: 14px;
-        padding: 1.2rem 1.4rem;
-        border-left: 4px solid var(--primary);
-    }
-
-    .info-item .label {
-        font-size: 0.78rem;
-        font-weight: 700;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-        margin-bottom: 0.4rem;
-    }
-
-    .info-item .value {
-        font-size: 1.05rem;
-        font-weight: 700;
-        color: var(--dark);
-    }
-
-    /* Status badge */
-    .status-badge-lg {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.55rem 1.2rem;
-        border-radius: 50px;
-        font-size: 1rem;
-        font-weight: 700;
-    }
-
-    .status-dirty {
-        background: rgba(239, 68, 68, 0.12);
-        color: var(--danger);
-    }
-
-    .status-moderate {
-        background: rgba(245, 158, 11, 0.12);
-        color: var(--warning);
-    }
-
-    .status-clean {
-        background: rgba(16, 185, 129, 0.12);
-        color: var(--success);
-    }
-
-    /* Violation details section */
-    .section-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: var(--dark);
-        border-bottom: 2px solid rgba(201, 169, 97, 0.2);
-        padding-bottom: 0.6rem;
-        margin-bottom: 1.2rem;
-    }
-
-    .recommendations-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 0.8rem;
-    }
-
-    .recommendations-list li {
-        display: flex;
-        align-items: flex-start;
-        gap: 0.75rem;
-        background: #fff8ee;
-        border-radius: 10px;
-        padding: 0.85rem 1rem;
-        font-size: 0.95rem;
-        color: #4a3a1a;
-    }
-
     .rec-icon {
-        color: var(--primary);
-        flex-shrink: 0;
-        font-size: 1rem;
-        margin-top: 2px;
-    }
-
-    /* Actions bar */
-    .actions-bar {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        flex-wrap: wrap;
-        margin-top: 2rem;
-    }
-
-    .btn-download-pdf {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.6rem;
-        background: linear-gradient(135deg, var(--primary), #b8923a);
-        color: white;
-        padding: 0.9rem 2rem;
-        border-radius: 12px;
-        font-weight: 700;
-        font-size: 1rem;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(201, 169, 97, 0.35);
-    }
-
-    .btn-download-pdf:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(201, 169, 97, 0.5);
-        color: white;
-        text-decoration: none;
-    }
-
-    .btn-back {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        background: white;
-        border: 2px solid var(--primary);
-        color: var(--primary);
-        padding: 0.9rem 1.6rem;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 0.95rem;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-
-    .btn-back:hover {
-        background: var(--primary);
-        color: white;
-        text-decoration: none;
-    }
-
-    .notice-box {
-        background: rgba(239, 68, 68, 0.06);
-        border: 1px solid rgba(239, 68, 68, 0.2);
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        display: flex;
-        gap: 1.25rem;
-        align-items: flex-start;
-    }
-
-    .notice-icon {
-        width: 48px;
-        height: 48px;
-        background: #fee2e2;
-        color: #ef4444;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.25rem;
-        flex-shrink: 0;
-    }
-
-    .notice-title {
-        color: #991b1b;
-        font-weight: 800;
-        margin-bottom: 0.25rem;
-        font-size: 1.1rem;
-    }
-
-    .notice-text {
-        color: #7f1d1d;
-        margin: 0;
-        font-size: 0.95rem;
-        line-height: 1.5;
+        width: 36px; height: 36px; border-radius: 10px;
+        background: white; color: var(--primary-dark);
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05); flex-shrink: 0;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="report-preview-container">
-    <!-- Page Header -->
-    <div class="page-header" data-aos="fade-up">
-        <h1 class="page-title">Violation Report</h1>
-        <p class="page-subtitle">Review your hygiene inspection report below</p>
+<div class="page-banner">
+    <div class="container banner-content" data-aos="fade-up">
+        <h1 class="banner-title">Violation Report Details</h1>
+        <p class="banner-subtitle">Official AI-verified inspection findings for your kitchen</p>
     </div>
+</div>
 
-    <!-- Report Card -->
-    <div class="report-card" data-aos="fade-up" data-aos-delay="80">
-
-        <!-- Banner -->
-        <div class="report-banner">
-            <div>
-                <h2><i class="fas fa-file-alt me-2"></i>Hygiene Violation Report</h2>
-                <div class="report-id">Report&nbsp;#{{ report.id }} &nbsp;|&nbsp; {{ report.issue_date|date:"F d, Y" }} at {{ report.issue_date|date:"h:i A" }}
-                </div>
-            </div>
-            <div class="brand-logo">
-                <span>RateMyKitchen</span>
-                AI Hygiene Intelligence
-            </div>
-        </div>
-
-        <!-- Body -->
-        <div class="report-body">
-
-            {% if report.hygiene_status == 'Dirty' %}
-            <div class="notice-box">
-                <div class="notice-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <div class="notice-content">
-                    <h5 class="notice-title">Immediate Action Required</h5>
-                    <p class="notice-text">
-                        This kitchen has been classified as <strong class="text-danger">Dirty</strong>. 
-                        Please address all hygiene violations immediately to ensure public safety and compliance.
-                    </p>
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Info Grid -->
-            <div class="info-grid">
-                <div class="info-item">
-                    <div class="label"><i class="fas fa-hotel me-1"></i>Establishment</div>
-                    <div class="value">{{ hotel.hotel_name }}</div>
-                </div>
-                <div class="info-item">
-                    <div class="label"><i class="far fa-calendar me-1"></i>Issue Date</div>
-                    <div class="value">{{ report.issue_date|date:"F d, Y" }} at {{ report.issue_date|date:"h:i A" }}</div>
-                </div>
-                <div class="info-item">
-                    <div class="label"><i class="fas fa-map-marker-alt me-1"></i>Address</div>
-                    <div class="value">{{ hotel.hotel_address|default:"—" }}</div>
-                </div>
-                <div class="info-item">
-                    <div class="label"><i class="fas fa-info-circle me-1"></i>Hygiene Status</div>
-                    <div class="value">
-                        <span class="status-badge-lg
-                            {% if report.hygiene_status == 'Dirty' %}status-dirty
-                            {% elif report.hygiene_status == 'Moderately Clean' %}status-moderate
-                            {% else %}status-clean{% endif %}">
-                            <i class="fas fa-exclamation-circle"></i>
-                            {{ report.hygiene_status }}
-                        </span>
+<div class="container mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="report-detail-card" data-aos="fade-up" data-aos-delay="100">
+                <!-- Header Accent -->
+                <div class="report-accent-bar d-flex justify-content-between align-items-center">
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7); margin-bottom: 0.25rem;">Kitchen Inspection ID</div>
+                        <h2 style="font-size: 1.75rem; font-weight: 900; margin: 0;">Report #{{ report.id|stringformat:"05d" }}</h2>
+                    </div>
+                    <div class="text-end d-none d-md-block">
+                        <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7); margin-bottom: 0.25rem;">Inspection Date</div>
+                        <div style="font-weight: 700; font-size: 1.1rem;">{{ report.issue_date|date:"F d, Y" }}</div>
                     </div>
                 </div>
-                <div class="info-item">
-                    <div class="label"><i class="fas fa-rupee-sign me-1"></i>Penalty Fine</div>
-                    <div class="value text-danger" style="font-size: 1.2rem;">₹ {{ report.fine_amount|default:"0.00" }}</div>
+
+                <!-- Report Sections -->
+                <div class="report-section">
+                    {% if report.hygiene_status == 'Dirty' %}
+                    <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 16px; padding: 1.5rem; margin-bottom: 2.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+                        <div style="width: 48px; height: 48px; background: #fee2e2; color: #ef4444; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div>
+                            <h5 style="color: #991b1b; font-weight: 800; margin-bottom: 0.25rem;">Immediate Action Required</h5>
+                            <p style="color: #7f1d1d; margin: 0; font-size: 0.95rem; line-height: 1.5;">This kitchen has been classified as <strong>Dirty</strong>. Please address all hygiene violations immediately to ensure public safety and compliance.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <h4 style="font-size: 1.2rem; font-weight: 800; color: var(--dark); margin-bottom: 1.5rem;">Inspection Meta-Data</h4>
+                    <div class="mb-5">
+                        <div class="info-row">
+                            <span class="info-label">Establishment Name</span>
+                            <span class="info-val">{{ hotel.hotel_name }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Inspection Time</span>
+                            <span class="info-val">{{ report.issue_date|date:"h:i A" }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Current Hygiene Status</span>
+                            <span class="info-val">
+                                <span class="status-pill-lg {% if report.hygiene_status == 'Dirty' %}status-dirty{% elif report.hygiene_status == 'Moderately Clean' %}status-moderate{% else %}status-clean{% endif %}">
+                                    <i class="fas fa-circle" style="font-size:0.5rem;"></i>
+                                    {{ report.hygiene_status }}
+                                </span>
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Violation Fine Applied</span>
+                            <span class="info-val text-danger" style="font-size: 1.25rem;">₹ {{ report.fine_amount|default:"0.00" }}</span>
+                        </div>
+                    </div>
+
+                    <h4 style="font-size: 1.2rem; font-weight: 800; color: var(--dark); margin-bottom: 1.5rem;">Mandatory Recommendations</h4>
+                    <div class="row g-3 mb-5">
+                        <div class="col-md-6">
+                            <div class="rec-card">
+                                <div class="rec-icon"><i class="fas fa-broom"></i></div>
+                                <div style="font-size: 0.9rem; color: var(--text-sub); line-height: 1.5;">Deep cleaning of all kitchen surfaces and utensils.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="rec-card">
+                                <div class="rec-icon"><i class="fas fa-user-shield"></i></div>
+                                <div style="font-size: 0.9rem; color: var(--text-sub); line-height: 1.5;">Staff re-training on hygiene protocols.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="rec-card">
+                                <div class="rec-icon"><i class="fas fa-calendar-check"></i></div>
+                                <div style="font-size: 0.9rem; color: var(--text-sub); line-height: 1.5;">Schedule follow-up within 7 working days.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="rec-card">
+                                <div class="rec-icon"><i class="fas fa-camera"></i></div>
+                                <div style="font-size: 0.9rem; color: var(--text-sub); line-height: 1.5;">Upload fresh kitchen scans for verification.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-3 pt-4 border-top">
+                        <a href="/User/download-report-pdf/{{ report.id }}/" class="btn" style="background: var(--dark); color: white; padding: 0.8rem 2rem; border-radius: 12px; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                            <i class="fas fa-file-pdf"></i> Download Official PDF
+                        </a>
+                        <a href="/User/reports/" class="btn" style="background: white; color: var(--text-sub); border: 2px solid var(--border); padding: 0.8rem 2rem; border-radius: 12px; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s;">
+                            <i class="fas fa-arrow-left"></i> Back to History
+                        </a>
+                    </div>
                 </div>
             </div>
-
-            <!-- Recommendations -->
-            <div class="section-title"><i class="fas fa-clipboard-list me-2"></i>Recommended Actions</div>
-            <ul class="recommendations-list">
-                <li><span class="rec-icon"><i class="fas fa-broom"></i></span>Immediate deep cleaning of all kitchen
-                    surfaces is required.</li>
-                <li><span class="rec-icon"><i class="fas fa-user-shield"></i></span>Implement strict hygiene protocols
-                    and conduct staff training.</li>
-                <li><span class="rec-icon"><i class="fas fa-calendar-check"></i></span>Schedule a follow-up inspection
-                    within 7 days.</li>
-                <li><span class="rec-icon"><i class="fas fa-clipboard"></i></span>Maintain daily cleaning logs and
-                    hygiene documentation.</li>
-                <li><span class="rec-icon"><i class="fas fa-check-circle"></i></span>Address all detected violations
-                    before resuming normal operations.</li>
-            </ul>
-
-            <!-- Actions -->
-            <div class="actions-bar">
-                <a href="/User/download-report-pdf/{{ report.id }}/" class="btn-download-pdf">
-                    <i class="fas fa-download"></i> Download PDF
-                </a>
-                <a href="/User/reports/" class="btn-back">
-                    <i class="fas fa-arrow-left"></i> Back to Reports
-                </a>
-            </div>
-
-        </div><!-- /.report-body -->
-    </div><!-- /.report-card -->
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -218,8 +218,10 @@ def _generate_pdf_file(hotel):
     upload = UploadModel.objects.filter(hotel=hotel).order_by('-uploaded_at').first()
     status = hotel.hygiene_status
     
-    # We use the existing User template for consistency/premium look
-    template = get_template('User/ReportPDF.html')
+    if status == "Clean":
+        template = get_template('User/CertificatePDF.html')
+    else:
+        template = get_template('User/ReportPDF.html')
     
     # Create a dummy report object if one doesn't exist yet for rendering
     # or fetch the most recent one
@@ -244,10 +246,18 @@ def _generate_pdf_file(hotel):
 
     # Render HTML to PDF
     context = {'report': report, 'hotel': hotel}
+    if status == "Clean":
+        from User.models import Certificate
+        context['cert'] = Certificate.objects.filter(hotel=hotel).order_by('-id').first()
     html = template.render(context)
     
     with open(pdf_path, "wb") as f:
-        pisa_status = pisa.CreatePDF(html, dest=f)
+        if status == "Clean":
+            # A4 Landscape: 297mm x 210mm in points (1pt = 1/72 inch, 1mm = 2.8346pt)
+            # 297mm = 841.89pt, 210mm = 595.28pt
+            pisa_status = pisa.CreatePDF(html, dest=f, pagesize=(841.89, 595.28))
+        else:
+            pisa_status = pisa.CreatePDF(html, dest=f)
     
     if pisa_status.err:
         return None
@@ -255,6 +265,13 @@ def _generate_pdf_file(hotel):
     if status != "Clean" and report:
         report.pdf_file = f"violation_reports/{pdf_name}"
         report.save()
+        
+    elif status == "Clean":
+        from User.models import Certificate
+        cert = Certificate.objects.filter(hotel=hotel).order_by('-id').first()
+        if cert:
+            cert.file = pdf_name
+            cert.save()
         
     return pdf_path
 
@@ -326,6 +343,10 @@ def send_official_warning(request, hotel_id=None, complaint_id=None):
             message=msg,
             fine_amount=fine_amount
         )
+        
+        # Deactivate any active certificates
+        from User.models import Certificate
+        Certificate.objects.filter(hotel=hotel, status="Active").update(status="Deactivated")
         
         messages.success(request, f"Official warning and PDF report sent to {hotel.hotel_name} successfully.")
         

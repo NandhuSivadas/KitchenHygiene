@@ -1,1018 +1,498 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RateMyKitchen - Hotel Dashboard</title>
+    <title>Dashboard - RateMyKitchen</title>
 
-    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap"
-        rel="stylesheet">
-
-    <!-- AOS Animation Library -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <style>
         :root {
             --primary: #C9A961;
             --primary-dark: #A88B4F;
-            --primary-light: #E5D4A6;
-            --secondary: #2C3E50;
-            --accent: #3498DB;
+            --primary-light: #f5e9cb;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --light: #F8F9FA;
-            --white: #FFFFFF;
-            --dark: #1A1A1A;
-            --text-primary: #2C3E50;
-            --text-secondary: #6C757D;
-            --glass-bg: rgba(255, 255, 255, 0.7);
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.12);
-            --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.16);
+            --dark: #0f172a;
+            --dark2: #1e293b;
+            --card-bg: #ffffff;
+            --body-bg: #f8fafc;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --border: rgba(0,0,0,0.06);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
-            color: var(--text-primary);
-            overflow-x: hidden;
-            position: relative;
+            background: var(--body-bg);
+            color: var(--text-main);
+            min-height: 100vh;
         }
 
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
+        h1, h2, h3, h4, h5 {
             font-family: 'Playfair Display', serif;
-            font-weight: 800;
-            letter-spacing: -0.02em;
         }
 
-        /* Advanced Animated Background */
-        .animated-bg {
-            position: fixed;
+        /* ── SCROLL PROGRESS ── */
+        .scroll-progress {
+            position: fixed; top: 0; left: 0; height: 3px; z-index: 9999;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            transition: width 0.1s linear;
+        }
+
+        /* ── NAVBAR ── */
+        .top-nav {
+            position: sticky;
             top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
+            z-index: 1000;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.9rem 0;
         }
-
-        /* Mesh Gradient Background */
-        .mesh-gradient {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background:
-                radial-gradient(at 20% 30%, rgba(201, 169, 97, 0.15) 0px, transparent 50%),
-                radial-gradient(at 80% 20%, rgba(52, 152, 219, 0.1) 0px, transparent 50%),
-                radial-gradient(at 40% 70%, rgba(201, 169, 97, 0.12) 0px, transparent 50%),
-                radial-gradient(at 90% 80%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
-            animation: mesh-move 20s ease-in-out infinite;
-        }
-
-        @keyframes mesh-move {
-
-            0%,
-            100% {
-                transform: scale(1) rotate(0deg);
-            }
-
-            50% {
-                transform: scale(1.1) rotate(5deg);
-            }
-        }
-
-        /* Floating Orbs */
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(60px);
-            opacity: 0.4;
-            animation: float-orb 20s ease-in-out infinite;
-        }
-
-        .orb-1 {
-            width: 400px;
-            height: 400px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            top: -100px;
-            right: -100px;
-            animation-delay: 0s;
-        }
-
-        .orb-2 {
-            width: 300px;
-            height: 300px;
-            background: linear-gradient(135deg, var(--accent), var(--success));
-            bottom: -50px;
-            left: -50px;
-            animation-delay: 5s;
-        }
-
-        .orb-3 {
-            width: 250px;
-            height: 250px;
-            background: linear-gradient(135deg, var(--primary-light), var(--primary));
-            top: 50%;
-            left: 50%;
-            animation-delay: 10s;
-        }
-
-        @keyframes float-orb {
-
-            0%,
-            100% {
-                transform: translate(0, 0) scale(1);
-            }
-
-            33% {
-                transform: translate(50px, -50px) scale(1.1);
-            }
-
-            66% {
-                transform: translate(-30px, 30px) scale(0.9);
-            }
-        }
-
-        /* Glassmorphism Navbar */
-        .navbar-glass {
-            background: rgba(255, 255, 255, 0.8) !important;
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid rgba(201, 169, 97, 0.1);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
-            padding: 1rem 0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .navbar-glass.scrolled {
-            padding: 0.5rem 0;
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar-brand {
-            font-family: 'Playfair Display', serif;
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--dark);
+        .nav-brand {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            transition: transform 0.3s ease;
+            text-decoration: none;
+            color: var(--dark);
+            font-family: 'Playfair Display', serif;
+            font-weight: 800;
+            font-size: 1.3rem;
         }
-
-        .navbar-brand:hover {
-            transform: scale(1.05);
-        }
-
-        .brand-icon {
-            width: 48px;
-            height: 48px;
+        .nav-brand-icon {
+            width: 42px; height: 42px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.2rem;
-            box-shadow: 0 8px 24px rgba(201, 169, 97, 0.3);
-            position: relative;
-            overflow: hidden;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.1rem;
         }
-
-        .brand-icon::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transform: translateX(-100%);
-            animation: shine 3s infinite;
-        }
-
-        @keyframes shine {
-            0% {
-                transform: translateX(-100%);
-            }
-
-            100% {
-                transform: translateX(100%);
-            }
-        }
-
-        .nav-link {
-            color: var(--text-secondary) !important;
+        .nav-links { display: flex; align-items: center; gap: 0.25rem; }
+        .nav-link-item {
+            display: flex; align-items: center; gap: 0.4rem;
+            padding: 0.5rem 0.9rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
             font-weight: 500;
-            font-size: 0.95rem;
-            position: relative;
-            padding: 0.5rem 1rem !important;
-            transition: all 0.3s ease;
+            color: var(--text-sub);
+            text-decoration: none;
+            transition: all 0.2s;
         }
-
-        .nav-link::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-            transform: translateX(-50%);
-            transition: width 0.3s ease;
+        .nav-link-item:hover, .nav-link-item.active {
+            background: rgba(201,169,97,0.1);
+            color: var(--primary-dark);
         }
-
-        .nav-link:hover::before {
-            width: 80%;
-        }
-
-        .nav-link:hover {
-            color: var(--primary) !important;
-        }
-
-        .btn-logout {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        .nav-link-item i { font-size: 0.85rem; }
+        .btn-nav-logout {
+            background: linear-gradient(135deg, var(--dark), var(--dark2));
             color: white;
             border: none;
-            padding: 0.65rem 1.75rem;
-            border-radius: 50px;
+            padding: 0.55rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.88rem;
             font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 15px rgba(201, 169, 97, 0.3);
+            cursor: pointer;
+            display: flex; align-items: center; gap: 0.4rem;
+            transition: all 0.3s;
+        }
+        .btn-nav-logout:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+
+        /* ── HERO BANNER ── */
+        .hero-banner {
+            background: linear-gradient(135deg, var(--dark) 0%, #1e293b 60%, #293548 100%);
+            padding: 3.5rem 0 4rem;
             position: relative;
             overflow: hidden;
         }
-
-        .btn-logout::before {
+        .hero-banner::before {
             content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
+            position: absolute; top: 0; right: 0; bottom: 0;
+            width: 45%;
+            background: radial-gradient(circle at 70% 50%, rgba(201,169,97,0.15) 0%, transparent 70%);
         }
-
-        .btn-logout:hover::before {
-            width: 300px;
-            height: 300px;
+        .hero-banner::after {
+            content: '';
+            position: absolute; top: -60px; right: -60px;
+            width: 350px; height: 350px; border-radius: 50%;
+            background: rgba(201,169,97,0.07);
         }
-
-        .btn-logout:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(201, 169, 97, 0.4);
-        }
-
-        /* Hero Section */
-        .hero-section {
-            padding: 100px 0 80px;
-            position: relative;
-        }
-
-        .welcome-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, rgba(201, 169, 97, 0.1), rgba(201, 169, 97, 0.05));
-            border: 1px solid rgba(201, 169, 97, 0.2);
+        .hero-tag {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(201,169,97,0.15);
+            border: 1px solid rgba(201,169,97,0.3);
+            color: var(--primary-light);
+            padding: 0.4rem 1rem;
             border-radius: 50px;
-            font-size: 0.9rem;
+            font-size: 0.82rem;
             font-weight: 600;
-            color: var(--primary-dark);
-            margin-bottom: 2rem;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 20px rgba(201, 169, 97, 0.1);
-            animation: badge-pulse 3s ease-in-out infinite;
+            letter-spacing: 0.5px;
+            margin-bottom: 1.25rem;
+            text-transform: uppercase;
         }
-
-        @keyframes badge-pulse {
-
-            0%,
-            100% {
-                transform: scale(1);
-                box-shadow: 0 4px 20px rgba(201, 169, 97, 0.1);
-            }
-
-            50% {
-                transform: scale(1.02);
-                box-shadow: 0 6px 30px rgba(201, 169, 97, 0.2);
-            }
-        }
-
-        .status-indicator {
-            width: 10px;
-            height: 10px;
+        .hero-tag .dot {
+            width: 7px; height: 7px; border-radius: 50%;
             background: var(--success);
-            border-radius: 50%;
-            position: relative;
-            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            animation: pulse-dot 2s ease-in-out infinite;
         }
-
-        @keyframes pulse-ring {
-
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-            }
-
-            50% {
-                box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
-            }
+        @keyframes pulse-dot {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
+            50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
         }
-
         .hero-title {
-            font-size: 4rem;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, var(--dark), var(--primary));
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: white;
+            line-height: 1.15;
+            margin-bottom: 0.75rem;
+        }
+        .hero-title span {
+            background: linear-gradient(135deg, var(--primary), #e8c97a);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: gradient-shift 5s ease infinite;
-            background-size: 200% 200%;
         }
-
-        @keyframes gradient-shift {
-
-            0%,
-            100% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-        }
-
         .hero-subtitle {
-            font-size: 1.25rem;
-            color: var(--text-secondary);
-            line-height: 1.7;
-            max-width: 650px;
-            margin-bottom: 3rem;
+            font-size: 1rem;
+            color: rgba(255,255,255,0.6);
+            max-width: 480px;
+            line-height: 1.6;
+            margin-bottom: 2rem;
         }
+        .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .btn-hero-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 0.8rem 1.75rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            text-decoration: none;
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            box-shadow: 0 6px 20px rgba(201,169,97,0.35);
+            transition: all 0.3s;
+        }
+        .btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(201,169,97,0.5); color: white; }
+        .btn-hero-secondary {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: white;
+            padding: 0.8rem 1.75rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.92rem;
+            text-decoration: none;
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        .btn-hero-secondary:hover { background: rgba(255,255,255,0.15); color: white; }
 
-        /* Advanced Card Styles */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: var(--shadow-md);
+        /* ── STATUS CARD (hero right panel) ── */
+        .status-panel {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
             padding: 2rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            position: relative; z-index: 1;
+        }
+        .status-panel-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.5);
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+        }
+        .status-row {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .status-row:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .status-row-label { font-size: 0.88rem; color: rgba(255,255,255,0.55); }
+        .status-pill {
+            font-size: 0.82rem; font-weight: 700;
+            padding: 0.35rem 0.9rem; border-radius: 50px;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+        }
+        .pill-clean { background: rgba(16,185,129,0.2); color: #4ade80; }
+        .pill-dirty { background: rgba(239,68,68,0.2); color: #f87171; }
+        .pill-moderate { background: rgba(245,158,11,0.2); color: #fbbf24; }
+        .status-value { font-size: 1.1rem; font-weight: 700; color: white; }
+
+        /* ── MAIN CONTENT ── */
+        .main-content { padding: 2.5rem 0 4rem; }
+
+        /* ── STAT CARDS ── */
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 1.75rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
             position: relative;
             overflow: hidden;
+            height: 100%;
         }
-
-        .glass-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--primary-dark), var(--primary));
-            background-size: 200% 100%;
-            animation: gradient-flow 3s linear infinite;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        .stat-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.1);
+            border-color: rgba(201,169,97,0.25);
         }
-
-        .glass-card:hover::before {
-            opacity: 1;
-        }
-
-        @keyframes gradient-flow {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            100% {
-                background-position: 200% 50%;
-            }
-        }
-
-        .glass-card:hover {
-            transform: translateY(-12px) scale(1.02);
-            box-shadow: var(--shadow-xl);
-            border-color: rgba(201, 169, 97, 0.3);
-        }
-
-        /* Stat Cards with Advanced Animations */
-        .stat-card {
-            position: relative;
-            cursor: pointer;
-        }
-
         .stat-card::after {
             content: '';
             position: absolute;
-            top: 0;
-            right: 0;
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, var(--primary) 0%, transparent 70%);
-            opacity: 0.08;
-            border-radius: 0 24px 0 100%;
-            transition: all 0.4s ease;
+            bottom: 0; right: 0;
+            width: 80px; height: 80px;
+            border-radius: 50% 0 18px 0;
+            opacity: 0.06;
+            transition: all 0.35s;
         }
+        .stat-card:hover::after { width: 110px; height: 110px; opacity: 0.1; }
+        .stat-card.gold::after { background: var(--primary); }
+        .stat-card.green::after { background: var(--success); }
+        .stat-card.blue::after { background: #3b82f6; }
+        .stat-card.purple::after { background: #8b5cf6; }
 
-        .stat-card:hover::after {
-            width: 150px;
-            height: 150px;
-            opacity: 0.12;
+        .stat-icon-box {
+            width: 52px; height: 52px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 1.25rem;
         }
+        .stat-icon-box.gold { background: linear-gradient(135deg, rgba(201,169,97,0.15), rgba(201,169,97,0.05)); color: var(--primary-dark); }
+        .stat-icon-box.green { background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05)); color: var(--success); }
+        .stat-icon-box.blue { background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(59,130,246,0.05)); color: #3b82f6; }
+        .stat-icon-box.purple { background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(139,92,246,0.05)); color: #8b5cf6; }
 
-        .stat-icon {
-            width: 64px;
-            height: 64px;
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.75rem;
-            margin-bottom: 1.5rem;
-            position: relative;
-            z-index: 1;
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-
-        .stat-card:hover .stat-icon {
-            transform: rotate(360deg) scale(1.1);
-        }
-
-        .stat-icon.success {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
-            color: var(--success);
-            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
-        }
-
-        .stat-icon.warning {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
-            color: var(--warning);
-            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.2);
-        }
-
-        .stat-icon.primary {
-            background: linear-gradient(135deg, rgba(201, 169, 97, 0.15), rgba(201, 169, 97, 0.05));
-            color: var(--primary);
-            box-shadow: 0 8px 24px rgba(201, 169, 97, 0.2);
-        }
-
-        .stat-icon.info {
-            background: linear-gradient(135deg, rgba(52, 152, 219, 0.15), rgba(52, 152, 219, 0.05));
-            color: var(--accent);
-            box-shadow: 0 8px 24px rgba(52, 152, 219, 0.2);
-        }
-
-        .stat-value {
-            font-size: 3rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--dark), var(--primary-dark));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--text-main);
             line-height: 1;
-            margin-bottom: 0.75rem;
-            position: relative;
-            z-index: 1;
+            margin-bottom: 0.35rem;
+            font-family: 'Inter', sans-serif;
         }
-
         .stat-label {
-            color: var(--text-secondary);
-            font-size: 1rem;
+            font-size: 0.82rem;
             font-weight: 600;
+            color: var(--text-sub);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            position: relative;
-            z-index: 1;
         }
 
-        /* Action Cards with 3D Effect */
-        .action-card {
-            cursor: pointer;
-            transform-style: preserve-3d;
-            perspective: 1000px;
-        }
-
-        .action-card:hover {
-            transform: translateY(-15px) rotateX(5deg);
-        }
-
-        .action-icon-wrapper {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 2.25rem;
-            margin-bottom: 1.75rem;
-            box-shadow: 0 12px 35px rgba(201, 169, 97, 0.35);
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s ease;
-        }
-
-        .action-card:hover .action-icon-wrapper {
-            transform: scale(1.1) rotate(10deg);
-            box-shadow: 0 16px 45px rgba(201, 169, 97, 0.45);
-        }
-
-        .action-icon-wrapper::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transform: translateX(-100%) rotate(45deg);
-            transition: transform 0.6s;
-        }
-
-        .action-card:hover .action-icon-wrapper::before {
-            transform: translateX(100%) rotate(45deg);
-        }
-
-        .action-title {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 1rem;
-        }
-
-        .action-description {
-            color: var(--text-secondary);
-            line-height: 1.7;
-            margin-bottom: 1.75rem;
-            font-size: 1.05rem;
-        }
-
-        .action-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 1.05rem;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .action-link::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: width 0.3s ease;
-        }
-
-        .action-link:hover::after {
-            width: 100%;
-        }
-
-        .action-link i {
-            transition: transform 0.3s ease;
-        }
-
-        .action-card:hover .action-link i {
-            transform: translateX(8px);
-        }
-
-        /* Activity Timeline */
-        .activity-timeline {
-            position: relative;
-            padding-left: 2rem;
-        }
-
-        .activity-timeline::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: linear-gradient(180deg, var(--primary), var(--primary-light));
-        }
-
-        .activity-item {
-            position: relative;
-            padding: 1.5rem;
+        /* Section header */
+        .section-head {
+            display: flex; align-items: center; justify-content: space-between;
             margin-bottom: 1.5rem;
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
+        }
+        .section-head h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+        .view-all {
+            font-size: 0.85rem; font-weight: 600;
+            color: var(--primary-dark);
+            text-decoration: none;
+            display: flex; align-items: center; gap: 0.35rem;
+            transition: gap 0.2s;
+        }
+        .view-all:hover { gap: 0.6rem; color: var(--primary-dark); }
+
+        /* ── QUICK ACTION TILES ── */
+        .action-tile {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 2rem 1.75rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            height: 100%;
+        }
+        .action-tile:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 45px rgba(0,0,0,0.1);
+            border-color: rgba(201,169,97,0.3);
+            color: inherit;
+        }
+        .tile-icon {
+            width: 64px; height: 64px;
             border-radius: 16px;
-            border: 1px solid rgba(201, 169, 97, 0.1);
-            transition: all 0.3s ease;
-            margin-left: 1rem;
-        }
-
-        .activity-item::before {
-            content: '';
-            position: absolute;
-            left: -2.5rem;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 16px;
-            height: 16px;
-            background: white;
-            border: 3px solid var(--primary);
-            border-radius: 50%;
-            box-shadow: 0 0 0 4px rgba(201, 169, 97, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .activity-item:hover {
-            transform: translateX(10px);
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: var(--shadow-md);
-        }
-
-        .activity-item:hover::before {
-            background: var(--primary);
-            box-shadow: 0 0 0 6px rgba(201, 169, 97, 0.2);
-        }
-
-        .activity-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            margin-bottom: 1rem;
-        }
-
-        .activity-icon.success {
-            background: linear-gradient(135deg, var(--success), #059669);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.75rem;
             color: white;
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+            margin-bottom: 1.5rem;
         }
+        .tile-icon.gold { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); box-shadow: 0 8px 20px rgba(201,169,97,0.3); }
+        .tile-icon.blue { background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 8px 20px rgba(59,130,246,0.3); }
+        .tile-icon.green { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 20px rgba(16,185,129,0.3); }
 
-        .activity-icon.warning {
-            background: linear-gradient(135deg, var(--warning), #d97706);
-            color: white;
-            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
-        }
-
-        .activity-title {
+        .tile-title {
+            font-size: 1.15rem;
             font-weight: 700;
-            color: var(--dark);
+            color: var(--text-main);
             margin-bottom: 0.5rem;
-            font-size: 1.1rem;
         }
-
-        .activity-time {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        .tile-desc {
+            font-size: 0.88rem;
+            color: var(--text-sub);
+            line-height: 1.6;
+            margin-bottom: 1.25rem;
         }
-
-        .activity-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
+        .tile-cta {
             font-size: 0.85rem;
             font-weight: 700;
-            margin-top: 0.75rem;
-        }
-
-        .badge-success {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
-            color: var(--success);
-        }
-
-        .badge-warning {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
-            color: var(--warning);
-        }
-
-        /* Section Headers */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2.5rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 2px solid rgba(201, 169, 97, 0.1);
-        }
-
-        .section-title {
-            font-size: 2.25rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--dark), var(--primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .view-all-link {
-            color: var(--primary);
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .view-all-link:hover {
-            gap: 1rem;
             color: var(--primary-dark);
+            display: flex; align-items: center; gap: 0.4rem;
+            transition: gap 0.2s;
         }
+        .action-tile:hover .tile-cta { gap: 0.7rem; }
 
-        /* Responsive */
+        /* ── ALERT BANNER ── */
+        .alert-banner {
+            background: linear-gradient(135deg, #fef2f2, #fff5f5);
+            border: 1px solid rgba(239,68,68,0.25);
+            border-radius: 14px;
+            padding: 1.1rem 1.5rem;
+            display: flex; align-items: center; gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .alert-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1rem; flex-shrink: 0;
+        }
+        .alert-text strong { display: block; font-size: 0.95rem; font-weight: 700; color: #dc2626; }
+        .alert-text span { font-size: 0.85rem; color: #9ca3af; }
+        .btn-alert {
+            margin-left: auto;
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.55rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-decoration: none;
+            flex-shrink: 0;
+            display: flex; align-items: center; gap: 0.4rem;
+            transition: all 0.2s;
+        }
+        .btn-alert:hover { background: #dc2626; color: white; transform: translateY(-1px); }
+
+        /* ── TIPS / DIVIDER ── */
+        .tip-card {
+            background: linear-gradient(135deg, var(--dark) 0%, #1e293b 100%);
+            border-radius: 18px;
+            padding: 2rem;
+            color: white;
+        }
+        .tip-card h3 { font-size: 1.2rem; font-weight: 700; color: var(--primary-light); margin-bottom: 1rem; }
+        .tip-item {
+            display: flex; align-items: flex-start; gap: 0.75rem;
+            margin-bottom: 0.85rem;
+            font-size: 0.88rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.5;
+        }
+        .tip-item:last-child { margin-bottom: 0; }
+        .tip-item i { color: var(--primary); margin-top: 2px; flex-shrink: 0; }
+
         @media (max-width: 768px) {
-            .hero-title {
-                font-size: 2.5rem;
-            }
-
-            .navbar-nav {
-                background: rgba(255, 255, 255, 0.95);
-                backdrop-filter: blur(20px);
-                padding: 1rem;
-                border-radius: 16px;
-                margin-top: 1rem;
-            }
-
-            .stat-value {
-                font-size: 2.25rem;
-            }
-
-            .action-title {
-                font-size: 1.5rem;
-            }
-        }
-
-        /* Scroll Animations */
-        [data-aos] {
-            pointer-events: auto;
-        }
-
-        /* Loading Animation */
-        @keyframes shimmer {
-            0% {
-                background-position: -1000px 0;
-            }
-
-            100% {
-                background-position: 1000px 0;
-            }
+            .hero-title { font-size: 2rem; }
+            .nav-links { display: none; }
         }
     </style>
 </head>
-
 <body>
-    <!-- Animated Background -->
-    <div class="animated-bg">
-        <div class="mesh-gradient"></div>
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-    </div>
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" id="scrollProgress"></div>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-glass sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="/User/homepage/">
-                <div class="brand-icon">
-                    <i class="fas fa-utensils"></i>
-                </div>
+    <!-- ── NAVBAR ── -->
+    <nav class="top-nav">
+        <div class="container d-flex align-items-center justify-content-between">
+            <a class="nav-brand" href="/User/homepage/">
+                <div class="nav-brand-icon"><i class="fas fa-utensils"></i></div>
                 RateMyKitchen
             </a>
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <i class="fas fa-bars text-dark"></i>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/User/homepage/">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/User/profile/">Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/User/certificates/">Certificates</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/User/reports/">Reports</a>
-                    </li>
-                    <li class="nav-item ms-lg-3">
-                        <button class="btn-logout" onclick="window.location.href='/User/logout/'">
-                            <i class="fas fa-sign-out-alt me-2"></i>Logout
-                        </button>
-                    </li>
-                </ul>
+            <div class="nav-links">
+                <a href="/User/homepage/" class="nav-link-item active"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="/User/profile/" class="nav-link-item"><i class="fas fa-user"></i> Profile</a>
+                <a href="/User/certificates/" class="nav-link-item"><i class="fas fa-certificate"></i> Certificates</a>
+                <a href="/User/reports/" class="nav-link-item"><i class="fas fa-file-alt"></i> Reports</a>
             </div>
+            <button class="btn-nav-logout" onclick="window.location.href='/User/logout/'">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero-section">
+    <!-- ── HERO BANNER ── -->
+    <section class="hero-banner">
         <div class="container">
-            <div data-aos="fade-up">
-                <div class="welcome-badge">
-                    <div class="status-indicator"></div>
-                    Welcome Back, Hotel Manager
-                </div>
-                <h1 class="hero-title" data-aos="fade-up" data-aos-delay="100">
-                    Your Kitchen Hygiene<br>Intelligence Hub
-                </h1>
-                <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="200">
-                    Monitor real-time hygiene status, manage AI-powered certifications, and maintain compliance with
-                    cutting-edge analytics.
-                </p>
-            </div>
-
-            <!-- Stats Grid -->
-            <div class="row g-4 mb-5">
-                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
-                    <div class="glass-card stat-card h-100">
-                        <div class="stat-icon success">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="stat-value">Clean</div>
-                        <div class="stat-label">Current Status</div>
+            <div class="row align-items-center g-4">
+                <div class="col-lg-7" data-aos="fade-right">
+                    <div class="hero-tag">
+                        <span class="dot"></span>
+                        Live Dashboard
                     </div>
-                </div>
-                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
-                    <div class="glass-card stat-card h-100">
-                        <div class="stat-icon primary">
-                            <i class="fas fa-certificate"></i>
-                        </div>
-                        <div class="stat-value">Active</div>
-                        <div class="stat-label">Certification</div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="500">
-                    <div class="glass-card stat-card h-100">
-                        <div class="stat-icon info">
-                            <i class="fas fa-camera"></i>
-                        </div>
-                        <div class="stat-value">12</div>
-                        <div class="stat-label">Total Scans</div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="600">
-                    <div class="glass-card stat-card h-100">
-                        <div class="stat-icon warning">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="stat-value">2</div>
-                        <div class="stat-label">Warnings</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Action Cards -->
-            <div class="row g-4 mb-5">
-                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="700">
-                    <div class="glass-card action-card h-100" onclick="window.location.href='/User/certificates/'">
-                        <div class="action-icon-wrapper">
-                            <i class="fas fa-certificate"></i>
-                        </div>
-                        <h3 class="action-title">Certificates</h3>
-                        <p class="action-description">
-                            Upload kitchen images or videos for instant AI-powered hygiene analysis and certification.
-                        </p>
-                        <a href="/User/certificates/" class="action-link">
-                            Get Certificate <i class="fas fa-arrow-right"></i>
+                    <h1 class="hero-title">
+                        Welcome back,<br><span>{{ user.hotel_name }}</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Monitor your kitchen hygiene, download certificates, and stay compliant — all from one place.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="/User/certificates/" class="btn-hero-primary">
+                            <i class="fas fa-certificate"></i> My Certificates
+                        </a>
+                        <a href="/User/reports/" class="btn-hero-secondary">
+                            <i class="fas fa-file-alt"></i> View Reports
                         </a>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="800">
-                    <div class="glass-card action-card h-100" onclick="window.location.href='/User/reports/'">
-                        <div class="action-icon-wrapper">
-                            <i class="fas fa-file-alt"></i>
-                        </div>
-                        <h3 class="action-title">View Reports</h3>
-                        <p class="action-description">
-                            Access comprehensive hygiene reports, certificates, and detailed violation history.
-                        </p>
-                        <a href="/User/reports/" class="action-link">
-                            View Reports <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="900">
-                    <div class="glass-card action-card h-100" onclick="window.location.href='/User/profile/'">
-                        <div class="action-icon-wrapper">
-                            <i class="fas fa-user-circle"></i>
-                        </div>
-                        <h3 class="action-title">Manage Profile</h3>
-                        <p class="action-description">
-                            Update hotel information, contact details, and customize your account settings.
-                        </p>
-                        <a href="/User/profile/" class="action-link">
-                            Edit Profile <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
+                <div class="col-lg-5" data-aos="fade-left" data-aos-delay="150">
+                    <div class="status-panel">
+                        <div class="status-panel-title">Current Status Overview</div>
 
-            <!-- Recent Activity -->
-            <div class="glass-card" data-aos="fade-up" data-aos-delay="1000">
-                <div class="section-header">
-                    <h2 class="section-title">Recent Activity</h2>
-                    <a href="/User/reports/" class="view-all-link">
-                        View All <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <div class="activity-timeline">
-                    <div class="activity-item" data-aos="fade-left" data-aos-delay="1100">
-                        <div class="d-flex align-items-start gap-3">
-                            <div class="activity-icon success">
-                                <i class="fas fa-check"></i>
-                            </div>
-                            <div class="flex-grow-1">
-                                <div class="activity-title">Kitchen Scan Completed</div>
-                                <div class="activity-time">
-                                    <i class="far fa-clock"></i>
-                                    2 hours ago
-                                </div>
-                                <div class="activity-badge badge-success">
-                                    <i class="fas fa-check-circle"></i>
-                                    Clean
-                                </div>
-                            </div>
+                        <div class="status-row">
+                            <span class="status-row-label"><i class="fas fa-shield-alt me-2"></i>Hygiene Status</span>
+                            <span class="status-pill {% if user.hygiene_status == 'Clean' %}pill-clean{% elif user.hygiene_status == 'Moderate' %}pill-moderate{% else %}pill-dirty{% endif %}">
+                                <i class="fas fa-circle" style="font-size:0.5rem;"></i>
+                                {{ user.hygiene_status|default:"Not Inspected" }}
+                            </span>
                         </div>
-                    </div>
 
-                    <div class="activity-item" data-aos="fade-left" data-aos-delay="1200">
-                        <div class="d-flex align-items-start gap-3">
-                            <div class="activity-icon success">
-                                <i class="fas fa-certificate"></i>
-                            </div>
-                            <div class="flex-grow-1">
-                                <div class="activity-title">Certificate Generated</div>
-                                <div class="activity-time">
-                                    <i class="far fa-clock"></i>
-                                    1 day ago
-                                </div>
-                                <div class="activity-badge badge-success">
-                                    <i class="fas fa-check-circle"></i>
-                                    Approved
-                                </div>
-                            </div>
+                        <div class="status-row">
+                            <span class="status-row-label"><i class="fas fa-certificate me-2"></i>Certificates</span>
+                            <span class="status-value">{{ hotel_certs }}</span>
                         </div>
-                    </div>
 
-                    <div class="activity-item" data-aos="fade-left" data-aos-delay="1300">
-                        <div class="d-flex align-items-start gap-3">
-                            <div class="activity-icon warning">
-                                <i class="fas fa-exclamation-circle"></i>
-                            </div>
-                            <div class="flex-grow-1">
-                                <div class="activity-title">Minor Violation Detected</div>
-                                <div class="activity-time">
-                                    <i class="far fa-clock"></i>
-                                    3 days ago
-                                </div>
-                                <div class="activity-badge badge-warning">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                    Review Required
-                                </div>
-                            </div>
+                        <div class="status-row">
+                            <span class="status-row-label"><i class="fas fa-camera me-2"></i>Kitchen Scans</span>
+                            <span class="status-value">{{ hotel_images }}</span>
+                        </div>
+
+                        <div class="status-row">
+                            <span class="status-row-label"><i class="fas fa-star me-2"></i>Customer Reviews</span>
+                            <span class="status-value">{{ hotel_reviews }}</span>
                         </div>
                     </div>
                 </div>
@@ -1020,331 +500,157 @@
         </div>
     </section>
 
-    <!-- Bootstrap JS -->
+    <!-- ── MAIN CONTENT ── -->
+    <div class="main-content">
+        <div class="container">
+
+            <!-- Alert Banner (only when dirty/moderate) -->
+            {% if user.hygiene_status != 'Clean' and user.hygiene_status %}
+            <div class="alert-banner" data-aos="fade-down">
+                <div class="alert-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="alert-text">
+                    <strong>Hygiene Alert — Action Required</strong>
+                    <span>Status is <strong>{{ user.hygiene_status }}</strong>. Upload fresh kitchen images to restore your certification.</span>
+                </div>
+                <a href="/User/certificates/" class="btn-alert">
+                    <i class="fas fa-upload"></i> Upload Now
+                </a>
+            </div>
+            {% endif %}
+
+            <!-- Stat Cards Row -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="50">
+                    <div class="stat-card gold">
+                        <div class="stat-icon-box gold"><i class="fas fa-certificate"></i></div>
+                        <div class="stat-number" data-count="{{ hotel_certs }}">{{ hotel_certs }}</div>
+                        <div class="stat-label">Certificates</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-card green">
+                        <div class="stat-icon-box green"><i class="fas fa-camera"></i></div>
+                        <div class="stat-number" data-count="{{ hotel_images }}">{{ hotel_images }}</div>
+                        <div class="stat-label">Kitchen Scans</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="150">
+                    <div class="stat-card blue">
+                        <div class="stat-icon-box blue"><i class="fas fa-star"></i></div>
+                        <div class="stat-number" data-count="{{ hotel_reviews }}">{{ hotel_reviews }}</div>
+                        <div class="stat-label">Customer Reviews</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-card purple">
+                        <div class="stat-icon-box purple">
+                            <i class="fas fa-{% if user.hygiene_status == 'Clean' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+                        </div>
+                        <div class="stat-number" style="font-size:1.4rem;margin-top:0.3rem;">
+                            {{ user.hygiene_status|default:"—" }}
+                        </div>
+                        <div class="stat-label">Hygiene Status</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="section-head mt-2 mb-1" data-aos="fade-up">
+                <h2>Quick Actions</h2>
+            </div>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="50">
+                    <a href="/User/certificates/" class="action-tile">
+                        <div class="tile-icon gold"><i class="fas fa-certificate"></i></div>
+                        <div class="tile-title">Hygiene Certificates</div>
+                        <div class="tile-desc">View, download, and manage your AI-verified hygiene certificates.</div>
+                        <div class="tile-cta">View Certificates <i class="fas fa-arrow-right"></i></div>
+                    </a>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    <a href="/User/reports/" class="action-tile">
+                        <div class="tile-icon blue"><i class="fas fa-file-alt"></i></div>
+                        <div class="tile-title">Inspection Reports</div>
+                        <div class="tile-desc">Access all hygiene inspection reports and violation history from AI scans.</div>
+                        <div class="tile-cta">View Reports <i class="fas fa-arrow-right"></i></div>
+                    </a>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="150">
+                    <a href="/User/profile/" class="action-tile">
+                        <div class="tile-icon green"><i class="fas fa-user-edit"></i></div>
+                        <div class="tile-title">Manage Profile</div>
+                        <div class="tile-desc">Update your hotel name, contact details, and account information.</div>
+                        <div class="tile-cta">Edit Profile <i class="fas fa-arrow-right"></i></div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tips Row -->
+            <div class="row g-3" data-aos="fade-up">
+                <div class="col-12">
+                    <div class="tip-card">
+                        <h3><i class="fas fa-lightbulb me-2"></i> Hygiene Tips to Stay Certified</h3>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="tip-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Clean surfaces and utensils regularly — at least every 4 hours during operations.</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="tip-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Upload kitchen images every month to maintain an Active certificate status.</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="tip-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Store food at proper temperatures and label all containers with dates.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- AOS Animation -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-
     <script>
-        // Initialize AOS
-        AOS.init({
-            duration: 800,
-            easing: 'ease-out-cubic',
-            once: true,
-            offset: 100
-        });
+        AOS.init({ duration: 700, easing: 'ease-out-cubic', once: true, offset: 60 });
 
-        // Navbar scroll effect
-        window.addEventListener('scroll', function () {
-            const navbar = document.querySelector('.navbar-glass');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // Add click ripple effect to cards
-        document.querySelectorAll('.glass-card').forEach(card => {
-            card.addEventListener('click', function (e) {
-                const ripple = document.createElement('div');
-                ripple.style.position = 'absolute';
-                ripple.style.borderRadius = '50%';
-                ripple.style.background = 'rgba(201, 169, 97, 0.3)';
-                ripple.style.width = ripple.style.height = '100px';
-                ripple.style.left = e.clientX - this.offsetLeft - 50 + 'px';
-                ripple.style.top = e.clientY - this.offsetTop - 50 + 'px';
-                ripple.style.animation = 'ripple 0.6s ease-out';
-                this.appendChild(ripple);
-                setTimeout(() => ripple.remove(), 600);
-            });
-        });
-
-        // Add ripple animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes ripple {
-                from {
-                    transform: scale(0);
-                    opacity: 1;
-                }
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // ========== ADVANCED PARTICLE SYSTEM ==========
-        const canvas = document.createElement('canvas');
-        canvas.style.position = 'fixed';
-        canvas.style.top = '0';
-        canvas.style.left = '0';
-        canvas.style.width = '100%';
-        canvas.style.height = '100%';
-        canvas.style.pointerEvents = 'none';
-        canvas.style.zIndex = '1';
-        document.body.appendChild(canvas);
-
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        const particles = [];
-        const particleCount = 50;
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 3 + 1;
-                this.speedX = Math.random() * 0.5 - 0.25;
-                this.speedY = Math.random() * 0.5 - 0.25;
-                this.opacity = Math.random() * 0.5 + 0.2;
-            }
-
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-
-                if (this.x > canvas.width) this.x = 0;
-                if (this.x < 0) this.x = canvas.width;
-                if (this.y > canvas.height) this.y = 0;
-                if (this.y < 0) this.y = canvas.height;
-            }
-
-            draw() {
-                ctx.fillStyle = `rgba(201, 169, 97, ${this.opacity})`;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        for (let i = 0; i < particleCount; i++) {
-            particles.push(new Particle());
-        }
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(particle => {
-                particle.update();
-                particle.draw();
-            });
-            requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-
-        // ========== MOUSE PARALLAX EFFECT ==========
-        let mouseX = 0, mouseY = 0;
-        document.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX / window.innerWidth - 0.5) * 20;
-            mouseY = (e.clientY / window.innerHeight - 0.5) * 20;
-        });
-
-        function parallaxEffect() {
-            document.querySelectorAll('.orb').forEach((orb, index) => {
-                const speed = (index + 1) * 0.5;
-                orb.style.transform = `translate(${mouseX * speed}px, ${mouseY * speed}px)`;
-            });
-            requestAnimationFrame(parallaxEffect);
-        }
-        parallaxEffect();
-
-        // ========== NUMBER COUNTER ANIMATION ==========
-        const observerOptions = {
-            threshold: 0.5,
-            rootMargin: '0px'
-        };
-
-        const animateValue = (element, start, end, duration) => {
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                const value = Math.floor(progress * (end - start) + start);
-                element.textContent = value;
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
-            };
-            window.requestAnimationFrame(step);
-        };
-
-        const counterObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && !entry.target.classList.contains('counted')) {
-                    entry.target.classList.add('counted');
-                    const text = entry.target.textContent;
-                    const number = parseInt(text);
-                    if (!isNaN(number)) {
-                        animateValue(entry.target, 0, number, 2000);
-                    }
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.stat-value').forEach(stat => {
-            const text = stat.textContent.trim();
-            if (!isNaN(parseInt(text))) {
-                counterObserver.observe(stat);
-            }
-        });
-
-        // ========== FLOATING ANIMATION FOR CARDS ==========
-        document.querySelectorAll('.glass-card').forEach((card, index) => {
-            const delay = index * 0.1;
-            card.style.animation = `float-card 3s ease-in-out ${delay}s infinite`;
-        });
-
-        const floatStyle = document.createElement('style');
-        floatStyle.textContent = `
-            @keyframes float-card {
-                0%, 100% {
-                    transform: translateY(0px);
-                }
-                50% {
-                    transform: translateY(-10px);
-                }
-            }
-        `;
-        document.head.appendChild(floatStyle);
-
-        // ========== CUSTOM CURSOR EFFECT ==========
-        const cursor = document.createElement('div');
-        cursor.style.width = '20px';
-        cursor.style.height = '20px';
-        cursor.style.border = '2px solid rgba(201, 169, 97, 0.5)';
-        cursor.style.borderRadius = '50%';
-        cursor.style.position = 'fixed';
-        cursor.style.pointerEvents = 'none';
-        cursor.style.zIndex = '9999';
-        cursor.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
-        cursor.style.transform = 'translate(-50%, -50%)';
-        document.body.appendChild(cursor);
-
-        const cursorDot = document.createElement('div');
-        cursorDot.style.width = '6px';
-        cursorDot.style.height = '6px';
-        cursorDot.style.background = 'rgba(201, 169, 97, 0.8)';
-        cursorDot.style.borderRadius = '50%';
-        cursorDot.style.position = 'fixed';
-        cursorDot.style.pointerEvents = 'none';
-        cursorDot.style.zIndex = '9999';
-        cursorDot.style.transform = 'translate(-50%, -50%)';
-        document.body.appendChild(cursorDot);
-
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            cursorDot.style.left = e.clientX + 'px';
-            cursorDot.style.top = e.clientY + 'px';
-        });
-
-        // Cursor interactions
-        document.querySelectorAll('a, button, .glass-card').forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                cursor.style.transform = 'translate(-50%, -50%) scale(1.5)';
-                cursor.style.borderColor = 'rgba(201, 169, 97, 1)';
-            });
-            el.addEventListener('mouseleave', () => {
-                cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-                cursor.style.borderColor = 'rgba(201, 169, 97, 0.5)';
-            });
-        });
-
-        // ========== SCROLL PROGRESS INDICATOR ==========
-        const progressBar = document.createElement('div');
-        progressBar.style.position = 'fixed';
-        progressBar.style.top = '0';
-        progressBar.style.left = '0';
-        progressBar.style.height = '3px';
-        progressBar.style.background = 'linear-gradient(90deg, var(--primary), var(--primary-dark))';
-        progressBar.style.zIndex = '10000';
-        progressBar.style.transition = 'width 0.1s ease';
-        document.body.appendChild(progressBar);
-
+        // Scroll progress bar
         window.addEventListener('scroll', () => {
-            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const winScroll = document.documentElement.scrollTop;
             const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrolled = (winScroll / height) * 100;
-            progressBar.style.width = scrolled + '%';
+            document.getElementById('scrollProgress').style.width = ((winScroll / height) * 100) + '%';
         });
 
-        // ========== TILT EFFECT ON CARDS ==========
-        document.querySelectorAll('.action-card').forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-
-                const rotateX = (y - centerY) / 10;
-                const rotateY = (centerX - x) / 10;
-
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-15px)`;
-            });
-
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
-            });
-        });
-
-        // ========== SPARKLE EFFECT ON HOVER ==========
-        function createSparkle(x, y) {
-            const sparkle = document.createElement('div');
-            sparkle.style.position = 'fixed';
-            sparkle.style.left = x + 'px';
-            sparkle.style.top = y + 'px';
-            sparkle.style.width = '4px';
-            sparkle.style.height = '4px';
-            sparkle.style.background = 'rgba(201, 169, 97, 0.8)';
-            sparkle.style.borderRadius = '50%';
-            sparkle.style.pointerEvents = 'none';
-            sparkle.style.zIndex = '9998';
-            sparkle.style.animation = 'sparkle-fade 1s ease-out forwards';
-            document.body.appendChild(sparkle);
-
-            setTimeout(() => sparkle.remove(), 1000);
+        // Count-up animation for stat numbers
+        function countUp(el, target, duration) {
+            if (isNaN(target)) return;
+            let start = 0, step = target / (duration / 16);
+            let timer = setInterval(() => {
+                start = Math.min(start + step, target);
+                el.textContent = Math.floor(start);
+                if (start >= target) clearInterval(timer);
+            }, 16);
         }
 
-        const sparkleStyle = document.createElement('style');
-        sparkleStyle.textContent = `
-            @keyframes sparkle-fade {
-                0% {
-                    transform: scale(0) translateY(0);
-                    opacity: 1;
-                }
-                100% {
-                    transform: scale(1.5) translateY(-30px);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(sparkleStyle);
-
-        document.querySelectorAll('.stat-icon, .action-icon-wrapper').forEach(icon => {
-            icon.addEventListener('mouseenter', function (e) {
-                const rect = this.getBoundingClientRect();
-                for (let i = 0; i < 5; i++) {
-                    setTimeout(() => {
-                        const x = rect.left + Math.random() * rect.width;
-                        const y = rect.top + Math.random() * rect.height;
-                        createSparkle(x, y);
-                    }, i * 100);
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !entry.target.dataset.counted) {
+                    entry.target.dataset.counted = '1';
+                    const val = parseInt(entry.target.dataset.count);
+                    if (!isNaN(val)) countUp(entry.target, val, 800);
                 }
             });
-        });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.stat-number[data-count]').forEach(el => observer.observe(el));
     </script>
 </body>
-
 </html>
