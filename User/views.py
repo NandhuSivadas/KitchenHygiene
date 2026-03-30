@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 
 
 from User.models import *
+from django.db.models import Sum, Avg
 
 
 
@@ -24,11 +25,22 @@ def homepage(request):
     if not hotel:
         return redirect("guest:login")
 
+    # Calculate dynamic stats
+    hotel_images = UploadModel.objects.filter(hotel=hotel).count()
+    hotel_reviews = CustomerReview.objects.filter(hotel=hotel).count()
+    hotel_certs = Certificate.objects.filter(hotel=hotel).count()
+    
+    # New Stats
+    fines = HygieneViolation.objects.filter(hotel=hotel).aggregate(total=Sum('fine_amount'))['total'] or 0
+    unseen_warnings = HotelWarning.objects.filter(hotel=hotel, is_read=False).count()
+
     ctx = {
         "user":          hotel,
-        "hotel_images":  KitchenImage.objects.filter(hotel=hotel).count(),
-        "hotel_reviews": CustomerReview.objects.filter(hotel=hotel).count(),
-        "hotel_certs":   Certificate.objects.filter(hotel=hotel).count(),
+        "hotel_images":  hotel_images,
+        "hotel_reviews": hotel_reviews,
+        "hotel_certs":   hotel_certs,
+        "total_fines":   fines,
+        "unseen_warnings": unseen_warnings,
     }
     return render(request, "User/Homepage.html", ctx)
 
@@ -219,6 +231,23 @@ def download_report_pdf(request, report_id):
     response = HttpResponse(buffer, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="ViolationReport_{report.id}_{hotel.hotel_name}.pdf"'
     return response
+
+
+def view_reviews(request):
+    """View all guest reviews for the logged-in hotel"""
+    hotel = _require_hotel(request)
+    if not hotel:
+        return redirect("guest:login")
+    
+    reviews = CustomerReview.objects.filter(hotel=hotel).order_by('-timestamp')
+    avg_rating = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
+    
+    return render(request, 'User/Reviews.html', {
+        'reviews': reviews,
+        'avg_rating': round(avg_rating, 1),
+        'total_reviews': reviews.count(),
+        'hotel': hotel
+    })
 
 
 

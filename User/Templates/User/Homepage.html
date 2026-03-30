@@ -437,6 +437,7 @@
                 <a href="/User/profile/" class="nav-link-item"><i class="fas fa-user"></i> Profile</a>
                 <a href="/User/certificates/" class="nav-link-item"><i class="fas fa-certificate"></i> Certificates</a>
                 <a href="/User/reports/" class="nav-link-item"><i class="fas fa-file-alt"></i> Reports</a>
+                <a href="/User/reviews/" class="nav-link-item"><i class="fas fa-star"></i> Reviews</a>
             </div>
             <button class="btn-nav-logout" onclick="window.location.href='/User/logout/'">
                 <i class="fas fa-sign-out-alt"></i> Logout
@@ -494,6 +495,13 @@
                             <span class="status-row-label"><i class="fas fa-star me-2"></i>Customer Reviews</span>
                             <span class="status-value">{{ hotel_reviews }}</span>
                         </div>
+
+                        {% if total_fines > 0 or unseen_warnings > 0 %}
+                        <div class="status-row">
+                            <span class="status-row-label"><i class="fas fa-wallet me-2"></i>Outstanding Fines</span>
+                            <span class="status-value text-danger">₹{{ total_fines }}</span>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -534,7 +542,7 @@
                         <div class="stat-label">Kitchen Scans</div>
                     </div>
                 </div>
-                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="150">
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="150" onclick="window.location.href='/User/reviews/'" style="cursor: pointer;">
                     <div class="stat-card blue">
                         <div class="stat-icon-box blue"><i class="fas fa-star"></i></div>
                         <div class="stat-number" data-count="{{ hotel_reviews }}">{{ hotel_reviews }}</div>

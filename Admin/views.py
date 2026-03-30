@@ -6,6 +6,7 @@ from django.contrib import messages
 from .yolov8_predict import check_hygiene
 from datetime import datetime, timedelta
 import re
+import uuid
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.http import FileResponse, HttpResponse
 def dashboard(request):
@@ -230,14 +231,20 @@ def _generate_pdf_file(hotel):
     # Differentiate logic for Clean vs Dirty
     if status == "Clean":
         from User.models import Certificate
-        Certificate.objects.get_or_create(
+        # 1. Deactivate old active certificates
+        Certificate.objects.filter(hotel=hotel, status="Active").update(status="Deactivated")
+        
+        # 2. Generate uniqe Cert Number
+        cert_no = f"RMK-{hotel.id}-{datetime.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:4].upper()}"
+        
+        # 3. Create fresh certificate record
+        Certificate.objects.create(
             hotel=hotel,
-            defaults={'valid_till': datetime.today() + timedelta(days=365)}
+            certificate_number=cert_no,
+            valid_till=datetime.today() + timedelta(days=365)
         )
         hotel.certificate_generated = True
         hotel.save()
-        # For clean reports, we might use a different logic or template, 
-        # but for now we follow the existing flow.
         
     pdf_name = f"{hotel.hotel_name}_{status}_Report.pdf"
     report_dir = settings.MEDIA_ROOT if status == "Clean" else os.path.join(settings.MEDIA_ROOT, "violation_reports")

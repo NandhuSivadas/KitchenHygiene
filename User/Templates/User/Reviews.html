@@ -1,0 +1,130 @@
+{% extends "User/Header.html" %}
+
+{% block title %}Guest Reviews - RateMyKitchen{% endblock %}
+
+{% block extra_styles %}
+<style>
+    /* Summary Card */
+    .rating-summary-card {
+        background: white; border-radius: 24px; padding: 2.5rem;
+        border: 1px solid var(--border); box-shadow: var(--shadow-md);
+        margin-bottom: 2.5rem; position: relative; overflow: hidden;
+    }
+    .rating-summary-card::before {
+        content: ''; position: absolute; top: -50px; right: -50px;
+        width: 200px; height: 200px; border-radius: 50%;
+        background: rgba(201,169,97,0.05); z-index: 1;
+    }
+
+    .avg-number { font-size: 4rem; font-weight: 900; color: var(--dark); line-height: 1; margin-bottom: 0.5rem; }
+    .stars-large { color: #f59e0b; font-size: 1.5rem; margin-bottom: 1rem; }
+    
+    /* Review Card */
+    .review-card {
+        background: white; border-radius: 20px; padding: 2rem;
+        border: 1px solid var(--border); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-bottom: 1.5rem; position: relative;
+    }
+    .review-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--primary-light); }
+    
+    .reviewer-avatar {
+        width: 48px; height: 48px; background: #f1f5f9; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        color: var(--text-sub); font-size: 1.25rem; font-weight: 700;
+    }
+    
+    .stars-small { color: #f59e0b; font-size: 0.9rem; }
+    .review-date { font-size: 0.82rem; color: var(--text-sub); }
+    .review-text { font-size: 1rem; color: var(--text-main); line-height: 1.6; font-style: italic; }
+
+    /* Empty State */
+    .empty-state { text-align: center; padding: 5rem 2rem; }
+    .empty-icon {
+        width: 100px; height: 100px; background: #f8fafc; border-radius: 50%;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 3rem; color: #cbd5e1; margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+    <div class="container banner-content" data-aos="fade-up">
+        <h1 class="banner-title">Guest Feedback</h1>
+        <p class="banner-subtitle">Real-time reviews and ratings from your customers</p>
+    </div>
+</div>
+
+<div class="container" style="margin-top: -3rem; position: relative; z-index: 5;">
+    {% if reviews %}
+    <div class="row g-4">
+        <!-- Summary Sidebar -->
+        <div class="col-lg-4" data-aos="fade-right">
+            <div class="rating-summary-card text-center">
+                <div style="position: relative; z-index: 2;">
+                    <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px;">Average Rating</p>
+                    <div class="avg-number">{{ avg_rating }}</div>
+                    <div class="stars-large">
+                        {% for i in "12345" %}
+                            <i class="fa{% if forloop.counter <= avg_rating %}s{% else %}r{% endif %} fa-star"></i>
+                        {% endfor %}
+                    </div>
+                    <p class="text-muted small">Based on <strong>{{ total_reviews }}</strong> guest reviews</p>
+                    
+                    <hr class="my-4" style="opacity: 0.1;">
+                    
+                    <div class="d-flex flex-column gap-3 text-start">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="small fw-600 text-muted">Service Quality</span>
+                            <div class="progress w-50" style="height: 6px;">
+                                <div class="progress-bar bg-warning" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="small fw-600 text-muted">Hygiene Sentiment</span>
+                            <div class="progress w-50" style="height: 6px;">
+                                <div class="progress-bar bg-success" style="width: 92%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review List -->
+        <div class="col-lg-8" data-aos="fade-left">
+            {% for review in reviews %}
+            <div class="review-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}00">
+                <div class="d-flex align-items-start gap-3 mb-3">
+                    <div class="reviewer-avatar">
+                        {{ review.customer_name|first|upper }}
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h5 style="font-size: 1.1rem; font-weight: 800; color: var(--dark); margin: 0;">{{ review.customer_name }}</h5>
+                            <span class="review-date">{{ review.timestamp|date:"d M Y" }}</span>
+                        </div>
+                        <div class="stars-small mt-1">
+                            {% for i in "12345" %}
+                                <i class="fa{% if forloop.counter <= review.rating %}s{% else %}r{% endif %} fa-star"></i>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <p class="review-text">"{{ review.review }}"</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="clean-card empty-state" data-aos="fade-up">
+        <div class="empty-icon"><i class="fas fa-comment-slash"></i></div>
+        <h3>No Reviews Yet</h3>
+        <p class="text-muted">Your guests haven't left any feedback yet. Reviews will appear here once they do!</p>
+        <a href="/User/homepage/" class="btn mt-3" style="background: var(--dark); color: white; padding: 0.75rem 1.75rem; border-radius: 10px; font-weight: 700; text-decoration: none;">
+            Return to Dashboard
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
