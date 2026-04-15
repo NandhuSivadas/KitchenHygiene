@@ -131,14 +131,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # settings.py
-import os
-from roboflow import Roboflow
+# import os
+# from roboflow import Roboflow
 
-ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY", "vF1McqVhLKKk8UqZAzv4")
-try:
-    rf = Roboflow(api_key=ROBOFLOW_API_KEY)
-    project = rf.workspace("your_workspace").project("your_project")
-    RF_MODEL = project.version(3).model
-except Exception as e:
-    print(f"Failed to initialize Roboflow model: {e}")
-    RF_MODEL = None
+# ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY", "vF1McqVhLKKk8UqZAzv4")
+# try:
+#     rf = Roboflow(api_key=ROBOFLOW_API_KEY)
+#     project = rf.workspace("your_workspace").project("your_project")
+#     RF_MODEL = project.version(3).model
+# except Exception as e:
+#     print(f"Failed to initialize Roboflow model: {e}")
+#     RF_MODEL = None
