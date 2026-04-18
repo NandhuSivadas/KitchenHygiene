@@ -3,7 +3,7 @@ from Admin.models import tbl_admin
 from User.models  import *
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .yolov8_predict import check_hygiene
+from .ml_service import call_ml_predict_api
 from datetime import datetime, timedelta
 import re
 import uuid
@@ -117,14 +117,12 @@ def admin_upload_image(request, hotel_id):
 
         if image_file:
             instance = UploadModel.objects.create(hotel=hotel, image=image_file)
-            status, all_labels, violations = check_hygiene(instance.image.path)
+            status, violations = call_ml_predict_api(instance.image.path)
             
         elif video_file:
             instance = UploadModel.objects.create(hotel=hotel, video=video_file)
             is_video = True
-            video_path = instance.video.path
-            from .yolov8_predict import check_video_hygiene
-            status, all_labels, violations = check_video_hygiene(video_path)
+            status, violations = call_ml_predict_api(instance.video.path, is_video=True)
 
         if instance:
             hotel.hygiene_status = status
@@ -401,9 +399,10 @@ def analyze_frame(request):
             for chunk in frame_file.chunks():
                 destination.write(chunk)
                 
-        # Run prediction
+        # Run prediction via API
         try:
-            status, labels, violations = check_hygiene(temp_path)
+            status, violations = call_ml_predict_api(temp_path)
+            labels = [] # Labels are now handled by the ML service
         except Exception as e:
             # Cleanup on error
             if os.path.exists(temp_path):

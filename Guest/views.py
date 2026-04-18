@@ -3,7 +3,7 @@ import re
 from django.contrib import messages
 from User.models import *   # hotel table
 from Admin.models import *
-from Admin.yolov8_predict import check_hygiene, check_video_hygiene
+from Admin.ml_service import call_ml_predict_api
 from django.shortcuts import get_object_or_404
 
 def homepage(request):
@@ -123,12 +123,9 @@ def report_violation(request):
             )
             file_path = complaint.image.path
             
-        # Run AI Analysis
+        # Run AI Analysis via Microservice
         try:
-            if is_video:
-                status, _, _ = check_video_hygiene(file_path)
-            else:
-                status, _, _ = check_hygiene(file_path)
+            status, violations = call_ml_predict_api(file_path, is_video=is_video)
             
             # Update status
             complaint.ai_status = status
