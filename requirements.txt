@@ -5,3 +5,9 @@ opencv-python-headless
 numpy
 reportlab
 ultralytics
+# AWS Production Dependencies
+python-decouple
+django-storages
+boto3
+psycopg2-binary
+whitenoise

@@ -116,35 +116,34 @@ def admin_upload_image(request, hotel_id):
         is_video = False
 
         if image_file:
-            # ✅ Save image
             instance = UploadModel.objects.create(hotel=hotel, image=image_file)
-            # ✅ Run prediction
             status, all_labels, violations = check_hygiene(instance.image.path)
             
         elif video_file:
-            # ✅ Save video
             instance = UploadModel.objects.create(hotel=hotel, video=video_file)
             is_video = True
             video_path = instance.video.path
-            
-            # ✅ Run video prediction
             from .yolov8_predict import check_video_hygiene
             status, all_labels, violations = check_video_hygiene(video_path)
 
         if instance:
-            # ✅ Update hygiene status of the hotel
             hotel.hygiene_status = status
             hotel.save()
 
-            context.update({
+            data = {
                 'image': instance.image.url if instance.image else None,
                 'video': instance.video.url if instance.video else None,
                 'is_video': is_video,
                 'status': status,
-                'violations': violations
-            })
+                'violations': violations,
+                'hotel_id': hotel.id
+            }
 
-            # Optional: redirect back after success
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                from django.http import JsonResponse
+                return JsonResponse(data)
+
+            context.update(data)
             messages.success(request, f"Hygiene status: {status}")
             return render(request, 'Admin/UploadImage.html', context)
 
