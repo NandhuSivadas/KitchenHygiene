@@ -4,7 +4,7 @@ pillow
 opencv-python-headless
 numpy
 reportlab
-ultralytics
+
 # AWS Production Dependencies
 python-decouple
 django-storages
