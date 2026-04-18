@@ -1,0 +1,156 @@
+{% extends "User/Header.html" %}
+
+{% block title %}Edit Profile - RateMyKitchen{% endblock %}
+
+{% block extra_styles %}
+<style>
+    /* Floating Label Overlay fixes for new theme */
+    .float-group { position: relative; margin-bottom: 1.5rem; }
+    .float-group .icon-wrap {
+        position: absolute; left: 1rem; top: 1.1rem;
+        color: var(--primary-dark); font-size: 0.95rem;
+        pointer-events: none; z-index: 5;
+    }
+    .float-input {
+        width: 100%;
+        padding: 1.6rem 1rem 0.6rem 2.8rem;
+        border: 2px solid var(--border);
+        border-radius: 14px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--dark);
+        background: #fcfcfc;
+        transition: all 0.3s;
+        outline: none;
+    }
+    .float-input:focus {
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(201,169,97,0.1);
+    }
+    .float-label {
+        position: absolute; left: 2.8rem; top: 0.5rem;
+        font-size: 0.72rem; font-weight: 700;
+        color: var(--text-sub);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        pointer-events: none;
+        transition: all 0.2s;
+    }
+    .float-input:focus ~ .float-label { color: var(--primary-dark); }
+    
+    textarea.float-input { min-height: 120px; padding-top: 1.8rem; }
+
+    .preview-badge {
+        font-size: 0.7rem; font-weight: 800; color: var(--primary-dark);
+        background: rgba(201,169,97,0.12);
+        padding: 0.3rem 0.8rem; border-radius: 50px;
+        text-transform: uppercase; letter-spacing: 0.5px;
+        display: inline-block; margin-bottom: 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+    <div class="container banner-content" data-aos="fade-up">
+        <h1 class="banner-title">Edit Profile</h1>
+        <p class="banner-subtitle">Update your hotel account information</p>
+    </div>
+</div>
+
+<div class="container" style="margin-top: -3rem; position: relative; z-index: 5;">
+    <div class="row g-4">
+        <!-- Edit Form -->
+        <div class="col-lg-7">
+            <div class="clean-card" data-aos="fade-up" data-aos-delay="100">
+                <h3 style="font-size: 1.4rem; font-weight: 800; color: var(--dark); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-user-edit text-primary"></i> Hotel Information
+                </h3>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center gap-3">
+                            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %}" style="font-size: 1.2rem;"></i>
+                            <span style="font-weight: 600;">{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="POST" id="editForm">
+                    {% csrf_token %}
+
+                    <div class="float-group">
+                        <div class="icon-wrap"><i class="fas fa-hotel"></i></div>
+                        <input type="text" class="float-input" id="txt_name" name="txt_name"
+                               value="{{ user.hotel_name }}" required
+                               oninput="document.getElementById('preview_name').textContent = this.value || '—';">
+                        <label class="float-label">Hotel Name</label>
+                    </div>
+
+                    <div class="float-group">
+                        <div class="icon-wrap"><i class="fas fa-envelope"></i></div>
+                        <input type="email" class="float-input" id="txt_email" name="txt_email"
+                               value="{{ user.hotel_email }}" required
+                               oninput="document.getElementById('preview_email').textContent = this.value || '—';">
+                        <label class="float-label">Email Address</label>
+                    </div>
+
+                    <div class="float-group">
+                        <div class="icon-wrap"><i class="fas fa-phone"></i></div>
+                        <input type="text" class="float-input" id="txt_contact" name="txt_contact"
+                               value="{{ user.hotel_contact }}" required
+                               oninput="document.getElementById('preview_contact').textContent = this.value || '—';">
+                        <label class="float-label">Contact Number</label>
+                    </div>
+
+                    <div class="float-group">
+                        <div class="icon-wrap"><i class="fas fa-map-marker-alt"></i></div>
+                        <textarea class="float-input" id="txt_address" name="txt_address" required
+                                  oninput="document.getElementById('preview_address').textContent = this.value || '—';">{{ user.hotel_address }}</textarea>
+                        <label class="float-label">Full Address</label>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-3 mt-4">
+                        <button type="submit" class="btn" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 0.8rem 2.25rem; border-radius: 12px; font-weight: 700; border: none; box-shadow: 0 8px 20px rgba(201,169,97,0.3); display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s;">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <a href="{% url 'webuser:myprofile' %}" class="btn" style="background: white; color: var(--text-sub); border: 2px solid var(--border); padding: 0.8rem 2.25rem; border-radius: 12px; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s;">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Live Preview -->
+        <div class="col-lg-5">
+            <div style="position: sticky; top: 6rem;">
+                <div class="clean-card" data-aos="fade-up" data-aos-delay="200" style="padding: 0; overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 2.5rem; text-align: center; color: white;">
+                        <div style="width: 70px; height: 70px; background: white; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; color: var(--primary-dark); font-size: 2.2rem; box-shadow: 0 8px 20px rgba(0,0,0,0.15); margin-bottom: 1.25rem;">
+                            <i class="fas fa-hotel"></i>
+                        </div>
+                        <div style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7); margin-bottom: 0.25rem;">Live Preview</div>
+                        <h4 id="preview_name" style="font-size: 1.5rem; font-weight: 800; margin: 0;">{{ user.hotel_name }}</h4>
+                    </div>
+                    <div style="padding: 2.5rem;">
+                        <div class="mb-4">
+                            <div class="preview-badge">Email</div>
+                            <div id="preview_email" style="font-weight: 600; color: var(--dark);">{{ user.hotel_email }}</div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="preview-badge">Contact</div>
+                            <div id="preview_contact" style="font-weight: 600; color: var(--dark);">{{ user.hotel_contact }}</div>
+                        </div>
+                        <div>
+                            <div class="preview-badge">Address</div>
+                            <div id="preview_address" style="font-weight: 600; color: var(--dark); line-height: 1.6;">{{ user.hotel_address }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends 'Admin/Header.html' %}
+{% load static %}
+{% block page_title %}Hygiene Reports{% endblock %}
+
+{% block content %}
+<div class="section-card">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+        <h4 class="section-title m-0">Kitchen Reports</h4>
+
+        <!-- Filter Controls -->
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+            <!-- Search Form -->
+            <form method="GET" class="d-flex m-0">
+                <input type="hidden" name="status" value="{{ current_status|default_if_none:'' }}">
+                <div class="input-group" style="width: 250px;">
+                    <input type="text" name="q" class="form-control" placeholder="Search by name..."
+                        value="{{ search_query|default_if_none:'' }}"
+                        style="border-radius: 20px 0 0 20px; border: 2px solid #E5E7EB; border-right: none; padding-left: 20px; box-shadow: none;">
+                    <button class="btn bg-white text-muted" type="submit"
+                        style="border-radius: 0 20px 20px 0; border: 2px solid #E5E7EB; border-left: none; box-shadow: none;">
+                        <i class="fas fa-search pt-1"></i>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Status Buttons -->
+            <div class="d-flex gap-2">
+                <a href="{% url 'webadmin:view_reports' %}?status=All{% if search_query %}&q={{ search_query }}{% endif %}"
+                    class="btn btn-sm rounded-pill px-3 {% if not current_status or current_status == 'All' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                    All
+                </a>
+                <a href="{% url 'webadmin:view_reports' %}?status=Clean{% if search_query %}&q={{ search_query }}{% endif %}"
+                    class="btn btn-sm rounded-pill px-3 {% if current_status == 'Clean' %}btn-success{% else %}btn-outline-success{% endif %}">
+                    Clean
+                </a>
+                <a href="{% url 'webadmin:view_reports' %}?status=Moderately Clean{% if search_query %}&q={{ search_query }}{% endif %}"
+                    class="btn btn-sm rounded-pill px-3 {% if current_status == 'Moderately Clean' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+                    Moderate
+                </a>
+                <a href="{% url 'webadmin:view_reports' %}?status=Dirty{% if search_query %}&q={{ search_query }}{% endif %}"
+                    class="btn btn-sm rounded-pill px-3 {% if current_status == 'Dirty' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                    Dirty
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reports Table -->
+    <div class="custom-table-container mt-4">
+        <table class="custom-table w-100">
+            <thead>
+                <tr>
+                    <th style="width: 40px; text-align: center;">#</th>
+                    <th>Hotel Name</th>
+                    <th>Address</th>
+                    <th>Hygiene Status</th>
+                    <th style="text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hotel in hotels %}
+                <tr>
+                    <td style="text-align: center;">
+                        <span style="font-weight: 600; color: #64748b; font-size: 0.9rem;">{{ forloop.counter }}</span>
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div
+                                style="width: 40px; height: 40px; background: linear-gradient(135deg, #e0e7ff, #f3e8ff); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 700; color: var(--primary);">
+                                {{ hotel.hotel_name.0|upper }}
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: var(--text-main);">{{ hotel.hotel_name }}</div>
+                                <div style="font-size: 0.85rem; color: #64748b;">{{ hotel.hotel_email }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="color: #64748b; font-size: 0.9rem; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                            title="{{ hotel.hotel_address }}">
+                            <i class="fas fa-map-marker-alt" style="color: var(--danger); margin-right: 5px;"></i>
+                            {{ hotel.hotel_address }}
+                        </div>
+                    </td>
+                    <td>
+                        {% if hotel.hygiene_status == 'Clean' %}
+                        <span class="status-pill status-clean">
+                            <i class="fas fa-check-circle" style="font-size: 0.7rem;"></i> Clean
+                        </span>
+                        {% elif hotel.hygiene_status == 'Dirty' %}
+                        <span class="status-pill status-unclean">
+                            <i class="fas fa-times-circle" style="font-size: 0.7rem;"></i> Dirty
+                        </span>
+                        {% else %}
+                        <span class="status-pill" style="background: rgba(245, 158, 11, 0.15); color: var(--warning);">
+                            <i class="fas fa-hourglass-half" style="font-size: 0.7rem;"></i> {{ hotel.hygiene_status }}
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: right;">
+                        <button type="button" class="btn-modern-success btn-sm px-3 py-2" data-bs-toggle="modal"
+                            data-bs-target="#reportModal{{ hotel.id }}">
+                            <i class="fas fa-eye"></i> View Report
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 4rem 2rem;">
+                        <div
+                            style="width: 80px; height: 80px; background: rgba(148, 163, 184, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                            <i class="fas fa-folder-open" style="font-size: 2.5rem; color: #94a3b8;"></i>
+                        </div>
+                        <h5 style="color: var(--text-main); font-weight: 700; margin-bottom: 0.5rem;">No reports found
+                        </h5>
+                        <p style="color: #64748b; margin: 0;">Try adjusting the filters.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Render all Report Modals outside the table structure to fix z-index and overlay issues -->
+{% for hotel in hotels %}
+<div class="modal fade" id="reportModal{{ hotel.id }}" tabindex="-1" aria-labelledby="reportModalLabel{{ hotel.id }}"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content"
+            style="border-radius: 20px; border: none; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2);">
+            <div class="modal-header bg-light border-0 py-3 px-4">
+                <h5 class="modal-title fw-bold" id="reportModalLabel{{ hotel.id }}">
+                    <i class="fas fa-file-pdf me-2 text-danger"></i> Hygiene Report - {{ hotel.hotel_name }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0" style="height: 75vh;">
+                <iframe src="{% url 'webadmin:view_report_pdf' hotel.id %}" width="100%" height="100%"
+                    style="border: none;"></iframe>
+            </div>
+            <div class="modal-footer bg-light border-0 py-3 px-4 d-flex justify-content-between">
+                <button type="button" class="btn btn-secondary rounded-pill px-4 fw-bold"
+                    data-bs-dismiss="modal">Close</button>
+                <a href="{% url 'webadmin:download_report_pdf' hotel.id %}"
+                    class="btn btn-success rounded-pill px-4 fw-bold shadow-sm"
+                    style="background: linear-gradient(135deg, var(--success), #059669); border: none;">
+                    <i class="fas fa-download me-2"></i>Download PDF
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends 'Admin/Header.html' %}
+{% load static %}
+
+{% block page_title %}Hotels{% endblock %}
+
+{% block content %}
+<div class="section-card">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="section-title m-0">Registered Hotels</h4>
+        <div class="d-flex gap-3 align-items-center">
+            <form method="GET" class="d-flex m-0">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control" placeholder="Search by name..."
+                        value="{{ search_query|default_if_none:'' }}"
+                        style="border-radius: 20px 0 0 20px; border: 2px solid #E5E7EB; border-right: none; padding-left: 20px; box-shadow: none;">
+                    <button class="btn bg-white text-muted" type="submit"
+                        style="border-radius: 0 20px 20px 0; border: 2px solid #E5E7EB; border-left: none; box-shadow: none;">
+                        <i class="fas fa-search pt-1"></i>
+                    </button>
+                </div>
+            </form>
+            <a href="{% url 'webadmin:add_hotel' %}" class="btn-modern rounded-pill px-4 text-decoration-none"
+                style="display: inline-flex; align-items: center;"><i class="fas fa-plus me-2 text-white"></i> <span
+                    class="text-white">Add New</span></a>
+        </div>
+    </div>
+
+    <div class="custom-table-container">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th style="width: 50px; text-align: center;">#</th>
+                    <th>Hotel Name</th>
+                    <th>Email</th>
+                    <th>Hygiene Status</th>
+                    <th style="text-align: center;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hotel in hotels %}
+                <tr>
+                    <td style="text-align: center;">
+                        <span style="font-weight: 600; color: #64748b; font-size: 0.9rem;">{{ forloop.counter }}</span>
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div
+                                style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+                                {{ hotel.hotel_name|first|upper }}
+                            </div>
+                            <span style="font-weight: 600; color: var(--text-main);">{{ hotel.hotel_name }}</span>
+                        </div>
+                    </td>
+                    <td style="color: #64748b;">{{ hotel.hotel_email }}</td>
+                    <td>
+                        <span
+                            class="status-pill {% if hotel.hygiene_status == 'Clean' %}status-clean{% else %}status-unclean{% endif %}">
+                            {% if hotel.hygiene_status == 'Clean' %}<i class="fas fa-check-circle"
+                                style="font-size: 0.7rem;"></i>{% else %}<i class="fas fa-times-circle"
+                                style="font-size: 0.7rem;"></i>{% endif %} {{ hotel.hygiene_status }}
+                        </span>
+                    </td>
+                    <td style="text-align: center;">
+                        <a href="{% url 'webadmin:admin_upload_image' hotel.id %}" class="btn-modern btn-sm px-3 py-2">
+                            <i class="fas fa-microscope text-white"></i> <span class="ms-1 text-white">Inspect</span>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-4">
+                        <div class="text-muted">
+                            <i class="fas fa-info-circle fa-2x mb-3"></i>
+                            <p>No hotels found.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

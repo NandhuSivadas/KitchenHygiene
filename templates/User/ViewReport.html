@@ -1,0 +1,152 @@
+{% extends "User/Header.html" %}
+
+{% block title %}Report #{{ report.id }} - RateMyKitchen{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .report-detail-card {
+        background: white; border-radius: 20px; overflow: hidden;
+        border: 1px solid var(--border); box-shadow: var(--shadow-lg);
+        position: relative; z-index: 5; margin-top: -3rem;
+    }
+    .report-accent-bar {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        padding: 2.5rem; color: white;
+    }
+    .report-section { padding: 2.5rem; }
+    
+    .info-row {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 1.25rem 0; border-bottom: 1px solid #f1f5f9;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { font-size: 0.75rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; }
+    .info-val { font-size: 1rem; font-weight: 700; color: var(--dark); }
+
+    .status-pill-lg {
+        padding: 0.5rem 1.25rem; border-radius: 50px; font-weight: 800; font-size: 0.9rem;
+        display: inline-flex; align-items: center; gap: 0.5rem;
+    }
+    .status-dirty { background: rgba(239,68,68,0.12); color: var(--danger); }
+    .status-moderate { background: rgba(245,158,11,0.12); color: var(--warning); }
+    .status-clean { background: rgba(16,185,129,0.12); color: var(--success); }
+
+    .rec-card {
+        background: #f8fafc; border-radius: 16px; padding: 1.5rem;
+        border: 1px solid var(--border); margin-bottom: 1rem;
+        display: flex; gap: 1rem; align-items: flex-start;
+    }
+    .rec-icon {
+        width: 36px; height: 36px; border-radius: 10px;
+        background: white; color: var(--primary-dark);
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05); flex-shrink: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+    <div class="container banner-content" data-aos="fade-up">
+        <h1 class="banner-title">Violation Report Details</h1>
+        <p class="banner-subtitle">Official AI-verified inspection findings for your kitchen</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="report-detail-card" data-aos="fade-up" data-aos-delay="100">
+                <!-- Header Accent -->
+                <div class="report-accent-bar d-flex justify-content-between align-items-center">
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7); margin-bottom: 0.25rem;">Kitchen Inspection ID</div>
+                        <h2 style="font-size: 1.75rem; font-weight: 900; margin: 0;">Report #{{ report.id|stringformat:"05d" }}</h2>
+                    </div>
+                    <div class="text-end d-none d-md-block">
+                        <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7); margin-bottom: 0.25rem;">Inspection Date</div>
+                        <div style="font-weight: 700; font-size: 1.1rem;">{{ report.issue_date|date:"F d, Y" }}</div>
+                    </div>
+                </div>
+
+                <!-- Report Sections -->
+                <div class="report-section">
+                    {% if report.hygiene_status == 'Dirty' %}
+                    <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 16px; padding: 1.5rem; margin-bottom: 2.5rem; display: flex; gap: 1.25rem; align-items: flex-start;">
+                        <div style="width: 48px; height: 48px; background: #fee2e2; color: #ef4444; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div>
+                            <h5 style="color: #991b1b; font-weight: 800; margin-bottom: 0.25rem;">Immediate Action Required</h5>
+                            <p style="color: #7f1d1d; margin: 0; font-size: 0.95rem; line-height: 1.5;">This kitchen has been classified as <strong>Dirty</strong>. Please address all hygiene violations immediately to ensure public safety and compliance.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <h4 style="font-size: 1.2rem; font-weight: 800; color: var(--dark); margin-bottom: 1.5rem;">Inspection Meta-Data</h4>
+                    <div class="mb-5">
+                        <div class="info-row">
+                            <span class="info-label">Establishment Name</span>
+                            <span class="info-val">{{ hotel.hotel_name }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Inspection Time</span>
+                            <span class="info-val">{{ report.issue_date|date:"h:i A" }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Current Hygiene Status</span>
+                            <span class="info-val">
+                                <span class="status-pill-lg {% if report.hygiene_status == 'Dirty' %}status-dirty{% elif report.hygiene_status == 'Moderately Clean' %}status-moderate{% else %}status-clean{% endif %}">
+                                    <i class="fas fa-circle" style="font-size:0.5rem;"></i>
+                                    {{ report.hygiene_status }}
+                                </span>
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Violation Fine Applied</span>
+                            <span class="info-val text-danger" style="font-size: 1.25rem;">₹ {{ report.fine_amount|default:"0.00" }}</span>
+                        </div>
+                    </div>
+
+                    <h4 style="font-size: 1.2rem; font-weight: 800; color: var(--dark); margin-bottom: 1.5rem;">Mandatory Recommendations</h4>
+                    <div class="row g-3 mb-5">
+                        <div class="col-md-6">
+                            <div class="rec-card">
+                                <div class="rec-icon"><i class="fas fa-broom"></i></div>
+                                <div style="font-size: 0.9rem; color: var(--text-sub); line-height: 1.5;">Deep cleaning of all kitchen surfaces and utensils.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="rec-card">
+                                <div class="rec-icon"><i class="fas fa-user-shield"></i></div>
+                                <div style="font-size: 0.9rem; color: var(--text-sub); line-height: 1.5;">Staff re-training on hygiene protocols.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="rec-card">
+                                <div class="rec-icon"><i class="fas fa-calendar-check"></i></div>
+                                <div style="font-size: 0.9rem; color: var(--text-sub); line-height: 1.5;">Schedule follow-up within 7 working days.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="rec-card">
+                                <div class="rec-icon"><i class="fas fa-camera"></i></div>
+                                <div style="font-size: 0.9rem; color: var(--text-sub); line-height: 1.5;">Upload fresh kitchen scans for verification.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-3 pt-4 border-top">
+                        <a href="/User/download-report-pdf/{{ report.id }}/" class="btn" style="background: var(--dark); color: white; padding: 0.8rem 2rem; border-radius: 12px; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                            <i class="fas fa-file-pdf"></i> Download Official PDF
+                        </a>
+                        <a href="/User/reports/" class="btn" style="background: white; color: var(--text-sub); border: 2px solid var(--border); padding: 0.8rem 2rem; border-radius: 12px; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s;">
+                            <i class="fas fa-arrow-left"></i> Back to History
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

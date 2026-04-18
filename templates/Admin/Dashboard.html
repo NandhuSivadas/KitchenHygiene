@@ -1,0 +1,223 @@
+{% extends 'Admin/Header.html' %}
+{% load static %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card primary" style="animation-delay: 0.1s;">
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-hotel"></i>
+            </div>
+            <div class="stat-value">{{ hotels_count }}</div>
+            <div class="stat-label">Total Kitchens</div>
+            <i class="fas fa-hotel stat-bg-icon"></i>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card success" style="animation-delay: 0.2s;">
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="stat-value">{{ clean_count }}</div>
+            <div class="stat-label">Hygiene Safe</div>
+            <i class="fas fa-shield-alt stat-bg-icon"></i>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card danger" style="animation-delay: 0.3s;">
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-biohazard"></i>
+            </div>
+            <div class="stat-value">{{ dirty_count }}</div>
+            <div class="stat-label">Violations</div>
+            <i class="fas fa-biohazard stat-bg-icon"></i>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card warning" style="animation-delay: 0.4s;">
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-user-clock"></i>
+            </div>
+            <div class="stat-value">{{ ver_pending_count }}</div>
+            <div class="stat-label">Pending Approval</div>
+            <i class="fas fa-user-clock stat-bg-icon"></i>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-8">
+        <div class="section-card h-100">
+            <h5 class="section-title mb-4">Hygiene Analytics & Trends</h5>
+            <div style="height: 300px; width: 100%;">
+                <canvas id="hygieneChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="section-card h-100">
+            <h5 class="section-title mb-4">Registration Status</h5>
+            <div style="height: 300px; width: 100%; position: relative;">
+                <canvas id="verificationChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="section-card" style="animation-delay: 0.5s;">
+            <div class="section-header d-flex justify-content-between align-items-center mb-4">
+                <h4 class="section-title m-0">Recently Registered Kitchens</h4>
+                <a href="{% url 'webadmin:view_hotels' %}" class="btn-outline-modern btn-sm px-4">View
+                    All</a>
+            </div>
+
+            <div class="custom-table-container">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Kitchen Name</th>
+                            <th>Contact</th>
+                            <th>Location</th>
+                            <th>Verification</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for hotel in recent_hotels %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div
+                                        style="width: 35px; height: 35px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 8px; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                                        {{ hotel.hotel_name|first|upper }}
+                                    </div>
+                                    <span class="fw-bold text-dark">{{ hotel.hotel_name }}</span>
+                                </div>
+                            </td>
+                            <td class="text-muted small">{{ hotel.hotel_email }}</td>
+                            <td class="text-muted small">{{ hotel.hotel_place|default:"-" }}</td>
+                            <td>
+                                {% if hotel.is_verified == 1 %}
+                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill">Verified</span>
+                                {% elif hotel.is_verified == 2 %}
+                                <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill">Rejected</span>
+                                {% else %}
+                                <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span
+                                    class="status-pill {% if hotel.hygiene_status == 'Clean' %}status-clean{% elif hotel.hygiene_status == 'Dirty' %}status-unclean{% else %}status-warning{% endif %}">
+                                    {{ hotel.hygiene_status }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'webadmin:admin_upload_image' hotel.id %}" class="btn-modern btn-sm">
+                                    <i class="fas fa-microscope text-white me-1"></i> Inspect
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">No recent activity.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Data from Django Context
+    // Fixed: Removed "|default:0" because .count() in views guarantees a number.
+    // This prevents your code editor from adding spaces and breaking Django.
+    // Fixed: Added quotes or used JS conditional logic to avoid breaking JS compiler
+    const cleanCount = parseInt('{{ clean_count|default:"0" }}') || 0;
+    const dirtyCount = parseInt('{{ dirty_count|default:"0" }}') || 0;
+    const pendingCount = parseInt('{{ pending_count|default:"0" }}') || 0;
+    const hotelsCount = parseInt('{{ hotels_count|default:"0" }}') || 0;
+
+    // Chart 1: Hygiene Bar Chart
+    const ctxHygiene = document.getElementById('hygieneChart').getContext('2d');
+    new Chart(ctxHygiene, {
+        type: 'bar',
+        data: {
+            labels: ['Total Kitchens', 'Clean', 'Violations Detected', 'Pending Inspection'],
+            datasets: [{
+                label: 'Kitchen Count',
+                data: [hotelsCount, cleanCount, dirtyCount, pendingCount],
+                backgroundColor: [
+                    'rgba(79, 70, 229, 0.7)', // Primary
+                    'rgba(16, 185, 129, 0.7)', // Success
+                    'rgba(239, 68, 68, 0.7)',  // Danger
+                    'rgba(245, 158, 11, 0.7)'  // Warning
+                ],
+                borderColor: [
+                    'rgba(79, 70, 229, 1)',
+                    'rgba(16, 185, 129, 1)',
+                    'rgba(239, 68, 68, 1)',
+                    'rgba(245, 158, 11, 1)'
+                ],
+                borderWidth: 1,
+                borderRadius: 8,
+                barThickness: 40
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.05)' }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+
+    // Chart 2: Verification Doughnut
+    const ctxVer = document.getElementById('verificationChart').getContext('2d');
+    new Chart(ctxVer, {
+        type: 'doughnut',
+        data: {
+            labels: ['Verified', 'Pending', 'Rejected'],
+            datasets: [{
+                data: [cleanCount, pendingCount, dirtyCount],
+                backgroundColor: [
+                    '#10b981', '#f59e0b', '#ef4444'
+                ],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+            },
+            cutout: '70%',
+        }
+    });
+</script>
+{% endblock %}

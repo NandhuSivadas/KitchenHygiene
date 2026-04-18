@@ -1,0 +1,59 @@
+{% extends "Admin/Header.html" %}
+{% block title %}Add New Hotel | Kitchen AI{% endblock %}
+{% block page_title %}Add New Hotel{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="section-card">
+            <h4 class="section-title mb-4">Add Hotel Information</h4>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="form-label text-muted fw-bold small text-uppercase" for="hotel_name">Hotel
+                        Name</label>
+                    <input type="text" id="hotel_name" name="hotel_name" class="modern-input"
+                        placeholder="Enter hotel name" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label text-muted fw-bold small text-uppercase" for="hotel_email">Email
+                        Address</label>
+                    <input type="email" id="hotel_email" name="hotel_email" class="modern-input"
+                        placeholder="Enter email address" required>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label text-muted fw-bold small text-uppercase"
+                            for="hotel_password">Password</label>
+                        <input type="password" id="hotel_password" name="hotel_password" class="modern-input"
+                            placeholder="Create password" required>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label text-muted fw-bold small text-uppercase" for="hotel_contact">Contact
+                            Number</label>
+                        <input type="text" id="hotel_contact" name="hotel_contact" class="modern-input"
+                            placeholder="Phone number" required>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label text-muted fw-bold small text-uppercase"
+                        for="hotel_address">Address</label>
+                    <textarea id="hotel_address" name="hotel_address" class="modern-input"
+                        placeholder="Enter complete address" rows="3" required></textarea>
+                </div>
+                <div class="text-end mt-5">
+                    <button type="submit" class="btn-modern px-5 text-white">Add Hotel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+<script>
+    {% for message in messages %}
+    alert("{{ message }}");
+    {% endfor %}
+</script>
+{% endif %}
+{% endblock %}

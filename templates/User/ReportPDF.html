@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Violation Report #{{ report.id }} - RateMyKitchen</title>
+    <style>
+        /* ── Reset & Base ── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            color: #1a1a2e;
+            background: #ffffff;
+        }
+
+        /* ── Header Banner ── */
+        .header-banner {
+            background-color: #1a1a2e;
+            padding: 28px 40px 24px 40px;
+        }
+
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-name {
+            color: #c9a961;
+            font-size: 22px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .brand-sub {
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 10px;
+            margin-top: 3px;
+        }
+
+        .report-type-label {
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .report-id-label {
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 10px;
+            text-align: right;
+            margin-top: 3px;
+        }
+
+        /* Gold accent bar */
+        .accent-bar {
+            background-color: #c9a961;
+            height: 5px;
+        }
+
+        /* ── Content ── */
+        .content {
+            padding: 36px 40px;
+        }
+
+        /* ── Section titles ── */
+        .section-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #1a1a2e;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 2px solid #c9a961;
+            padding-bottom: 6px;
+            margin-bottom: 16px;
+        }
+
+        /* ── Info table ── */
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 28px;
+        }
+
+        .info-table td {
+            padding: 10px 14px;
+            font-size: 11px;
+            vertical-align: top;
+            border: 1px solid #e8e0cc;
+        }
+
+        .info-table .label-cell {
+            background-color: #fdf8ee;
+            color: #7a6030;
+            font-weight: bold;
+            width: 35%;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-table .value-cell {
+            color: #1a1a2e;
+            font-size: 12px;
+        }
+
+        /* ── Status Badge ── */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .badge-dirty {
+            background-color: #fde8e8;
+            color: #c0392b;
+        }
+
+        .badge-moderate {
+            background-color: #fef3cd;
+            color: #b45309;
+        }
+
+        .badge-clean {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        /* ── Alert box ── */
+        .alert-box {
+            background-color: #fde8e8;
+            border: 1px solid #f5c6cb;
+            border-left: 5px solid #c0392b;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            font-size: 11px;
+            color: #7c1d1d;
+        }
+
+        /* ── Recommendations ── */
+        .recommendations {
+            margin-bottom: 28px;
+        }
+
+        .rec-item {
+            display: flex;
+            align-items: flex-start;
+            background-color: #fff8ee;
+            border: 1px solid #ecdcb0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            font-size: 11px;
+            color: #4a3a1a;
+        }
+
+        .rec-bullet {
+            color: #c9a961;
+            font-size: 14px;
+            font-weight: bold;
+            margin-right: 10px;
+            flex-shrink: 0;
+            margin-top: -1px;
+        }
+
+        /* ── Footer ── */
+        .footer {
+            margin-top: 40px;
+            padding-top: 16px;
+            border-top: 1px solid #e8e0cc;
+            text-align: center;
+            font-size: 9px;
+            color: #9a9a9a;
+        }
+
+        .footer strong {
+            color: #c9a961;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <div class="header-banner">
+        <div class="header-inner">
+            <div>
+                <div class="brand-name">RateMyKitchen</div>
+                <div class="brand-sub">AI-Powered Kitchen Hygiene Intelligence</div>
+            </div>
+            <div>
+                <div class="report-type-label">HYGIENE VIOLATION REPORT</div>
+                <div class="report-id-label">Report #{{ report.id }} &nbsp;|&nbsp; {{ report.issue_date|date:"F d, Y" }} at {{ report.issue_date|date:"h:i A" }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="accent-bar"></div>
+
+    <!-- Content -->
+    <div class="content">
+
+        {% if report.hygiene_status == 'Dirty' %}
+        <div class="alert-box">
+            <span style="font-size: 14px; font-weight: bold; color: #c0392b; display: block; margin-bottom: 4px;">
+                &#9888; IMMEDIATE ACTION REQUIRED
+            </span>
+            This kitchen has been classified as <strong style="color: #c0392b;">Dirty</strong>. 
+            All hygiene violations must be addressed immediately before resuming normal kitchen operations.
+        </div>
+        {% endif %}
+
+        <!-- Establishment Details -->
+        <div class="section-title">Establishment Details</div>
+        <table class="info-table">
+            <tr>
+                <td class="label-cell">Hotel / Restaurant</td>
+                <td class="value-cell">{{ hotel.hotel_name }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Address</td>
+                <td class="value-cell">{{ hotel.hotel_address|default:"—" }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Contact</td>
+                <td class="value-cell">{{ hotel.hotel_contact|default:"—" }}</td>
+            </tr>
+        </table>
+
+        <!-- Inspection Details -->
+        <div class="section-title">Inspection Summary</div>
+        <table class="info-table">
+            <tr>
+                <td class="label-cell">Report ID</td>
+                <td class="value-cell">#{{ report.id }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Issue Date</td>
+                <td class="value-cell">{{ report.issue_date|date:"F d, Y" }} at {{ report.issue_date|date:"h:i A" }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Hygiene Status</td>
+                <td class="value-cell">
+                    {% if report.hygiene_status == 'Dirty' %}
+                    <span class="badge badge-dirty">{{ report.hygiene_status }}</span>
+                    {% elif report.hygiene_status == 'Moderately Clean' %}
+                    <span class="badge badge-moderate">{{ report.hygiene_status }}</span>
+                    {% else %}
+                    <span class="badge badge-clean">{{ report.hygiene_status }}</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="label-cell">Fine Amount</td>
+                <td class="value-cell" style="font-weight: bold; color: #c0392b;">₹ {{ report.fine_amount|default:"0.00" }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Inspected By</td>
+                <td class="value-cell">RateMyKitchen AI Analysis System</td>
+            </tr>
+        </table>
+
+        <!-- Recommended Actions -->
+        <div class="section-title">Recommended Actions</div>
+        <div class="recommendations">
+            <div class="rec-item">
+                <span class="rec-bullet">&#10003;</span>
+                Immediate deep cleaning of all kitchen surfaces and equipment is required.
+            </div>
+            <div class="rec-item">
+                <span class="rec-bullet">&#10003;</span>
+                Implement strict hygiene protocols and conduct mandatory staff training sessions.
+            </div>
+            <div class="rec-item">
+                <span class="rec-bullet">&#10003;</span>
+                Schedule a follow-up inspection within 7 days to verify compliance.
+            </div>
+            <div class="rec-item">
+                <span class="rec-bullet">&#10003;</span>
+                Maintain daily cleaning logs and submit hygiene documentation to RateMyKitchen.
+            </div>
+            <div class="rec-item">
+                <span class="rec-bullet">&#10003;</span>
+                Address all detected violations before resuming normal kitchen operations.
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <strong>RateMyKitchen</strong> &mdash; AI-Powered Kitchen Hygiene Intelligence<br>
+            This report was automatically generated on {{ report.issue_date|date:"F d, Y" }} at {{ report.issue_date|date:"h:i A" }}. Official document for
+            internal and regulatory use.
+        </div>
+
+    </div>
+</body>
+
+</html>

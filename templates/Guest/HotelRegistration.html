@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register Hotel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* Center the form container */
+        .form-container {
+            background-color: #fff;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 320px;
+            text-align: center; /* center heading and message */
+        }
+
+        /* Form heading */
+        .form-container h2 {
+            color: #007BFF;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            font-size: 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        p {
+            font-weight: bold;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Hotel Registration</h2>
+        <form method="post">
+            {% csrf_token %}
+
+            <label>Hotel Name:</label>
+            <input type="text" name="hotel_name" required>
+
+            <label>Hotel Email:</label>
+            <input type="email" name="hotel_email" required>
+
+            <label>Password:</label>
+            <input type="password" name="hotel_password" required>
+
+            <label>Contact Number:</label>
+            <input type="text" name="hotel_contact">
+
+            <label>Address:</label>
+            <textarea name="hotel_address" rows="3"></textarea>
+
+            <label>Verification Status:</label>
+            <select name="is_verified">
+                <option value="0">Not Verified</option>
+                <option value="1">Verified</option>
+                <option value="2">Rejected</option>
+            </select>
+
+            <button type="submit">Register</button>
+        </form>
+
+        {% if message %}
+            <p>{{ message }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -7,7 +7,7 @@ from Admin.ml_service import call_ml_predict_api
 from django.shortcuts import get_object_or_404
 
 def homepage(request):
-    return render(request,'Guest\index.html')
+    return render(request,'Guest/index.html')
 
 
 
