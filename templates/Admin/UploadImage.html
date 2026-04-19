@@ -396,9 +396,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(form);
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout for AWS
+
         fetch(window.location.href, {
             method: 'POST',
             body: formData,
+            signal: controller.signal,
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRFToken': csrftoken
@@ -409,6 +413,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
+            clearTimeout(timeoutId);
             overlay.style.display = 'none';
             
             // Populate Modal Content
@@ -477,8 +482,13 @@ document.addEventListener('DOMContentLoaded', function() {
             resultModal.show();
         })
         .catch(err => {
+            clearTimeout(timeoutId);
             overlay.style.display = 'none';
-            alert("Analysis failed or timed out. Please try again.");
+            if (err.name === 'AbortError') {
+                alert("AI Analysis timed out after 60 seconds. The server might be busy or low on memory.");
+            } else {
+                alert("Analysis failed. Check your connection or file format.");
+            }
             console.error(err);
         });
     }
