@@ -3,7 +3,7 @@ from Admin.models import tbl_admin
 from User.models  import *
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .ml_service import call_ml_predict_api
+from .yolov8_predict import check_hygiene
 from datetime import datetime, timedelta
 import re
 import uuid
@@ -116,32 +116,35 @@ def admin_upload_image(request, hotel_id):
         is_video = False
 
         if image_file:
+            # ✅ Save image
             instance = UploadModel.objects.create(hotel=hotel, image=image_file)
-            status, violations = call_ml_predict_api(instance.image.path)
+            # ✅ Run prediction
+            status, all_labels, violations = check_hygiene(instance.image.path)
             
         elif video_file:
+            # ✅ Save video
             instance = UploadModel.objects.create(hotel=hotel, video=video_file)
             is_video = True
-            status, violations = call_ml_predict_api(instance.video.path, is_video=True)
+            video_path = instance.video.path
+            
+            # ✅ Run video prediction
+            from .yolov8_predict import check_video_hygiene
+            status, all_labels, violations = check_video_hygiene(video_path)
 
         if instance:
+            # ✅ Update hygiene status of the hotel
             hotel.hygiene_status = status
             hotel.save()
 
-            data = {
+            context.update({
                 'image': instance.image.url if instance.image else None,
                 'video': instance.video.url if instance.video else None,
                 'is_video': is_video,
                 'status': status,
-                'violations': violations,
-                'hotel_id': hotel.id
-            }
+                'violations': violations
+            })
 
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                from django.http import JsonResponse
-                return JsonResponse(data)
-
-            context.update(data)
+            # Optional: redirect back after success
             messages.success(request, f"Hygiene status: {status}")
             return render(request, 'Admin/UploadImage.html', context)
 
@@ -399,10 +402,9 @@ def analyze_frame(request):
             for chunk in frame_file.chunks():
                 destination.write(chunk)
                 
-        # Run prediction via API
+        # Run prediction
         try:
-            status, violations = call_ml_predict_api(temp_path)
-            labels = [] # Labels are now handled by the ML service
+            status, labels, violations = check_hygiene(temp_path)
         except Exception as e:
             # Cleanup on error
             if os.path.exists(temp_path):
