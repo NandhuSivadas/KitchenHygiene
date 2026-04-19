@@ -59,7 +59,7 @@
                     <th>Contact</th>
                     <th>Address</th>
                     <th>Status</th>
-                    <th>Actions</th>
+                    <th style="width: 220px; text-align: center;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -106,13 +106,13 @@
                         </span>
                     </td>
                     <td>
-                        <div style="display: flex; gap: 8px;">
+                        <div style="display: flex; gap: 8px; justify-content: center; width: 100%;">
                             <button onclick="showApproveModal('{{ hotel.id }}', '{{ hotel.hotel_name }}')"
-                                class="btn-modern-success btn-sm px-3 py-2">
+                                class="btn-modern-success btn-sm px-2 py-2" style="white-space: nowrap; flex: 1;">
                                 <i class="fas fa-check"></i> Approve
                             </button>
                             <button onclick="showRejectModal('{{ hotel.id }}', '{{ hotel.hotel_name }}')"
-                                class="btn-modern-danger btn-sm px-3 py-2">
+                                class="btn-modern-danger btn-sm px-2 py-2" style="white-space: nowrap; flex: 1;">
                                 <i class="fas fa-times"></i> Reject
                             </button>
                         </div>
