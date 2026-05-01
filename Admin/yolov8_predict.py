@@ -34,7 +34,7 @@ def check_hygiene(image_path):
                 
                 # Dynamic Thresholding
                 if label in ['lizard', 'rat', 'cockroach']:
-                    if conf > 0.10:  # Lowered threshold to ensure pests are caught
+                    if conf > 0.01:  # Absolute minimum threshold to catch AI-generated demo pests
                         detected_labels.append(label)
                 elif label in ['no_gloves', 'no_hairnet', 'no_apron']:
                     if conf > 0.02:  # Extremely low threshold for missing gear to catch the hardest detections
@@ -117,7 +117,7 @@ def check_video_hygiene(video_path):
                         # Dynamic Thresholding
                         valid_detection = False
                         if label in ['lizard', 'rat', 'cockroach']:
-                            if conf > 0.10:
+                            if conf > 0.01:
                                 valid_detection = True
                         elif label in ['no_gloves', 'no_hairnet', 'no_apron']:
                             if conf > 0.02:
