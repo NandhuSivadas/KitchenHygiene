@@ -106,6 +106,14 @@
                             <span class="info-label">Violation Fine Applied</span>
                             <span class="info-val text-danger" style="font-size: 1.25rem;">₹ {{ report.fine_amount|default:"0.00" }}</span>
                         </div>
+                        {% with warning=report.hotelwarning_set.first %}
+                        {% if warning and warning.message %}
+                        <div class="info-row" style="background: #fffbeb; border-left: 4px solid var(--warning); padding: 1.25rem 1.5rem; border-radius: 8px; margin-top: 1.5rem; align-items: flex-start; border-bottom: none;">
+                            <span class="info-label" style="min-width: 150px; padding-top: 0.2rem;">Official Reason</span>
+                            <span class="info-val" style="font-weight: 600; color: #92400e; line-height: 1.5;">{{ warning.message }}</span>
+                        </div>
+                        {% endif %}
+                        {% endwith %}
                     </div>
 
                     <h4 style="font-size: 1.2rem; font-weight: 800; color: var(--dark); margin-bottom: 1.5rem;">Mandatory Recommendations</h4>

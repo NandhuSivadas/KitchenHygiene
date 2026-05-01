@@ -270,6 +270,14 @@
                 <td class="label-cell">Inspected By</td>
                 <td class="value-cell">RateMyKitchen AI Analysis System</td>
             </tr>
+            {% with warning=report.hotelwarning_set.first %}
+            {% if warning and warning.message %}
+            <tr>
+                <td class="label-cell" style="background-color: #fef3cd; color: #b45309;">Official Reason</td>
+                <td class="value-cell" style="font-weight: bold; color: #92400e; padding-top: 12px; padding-bottom: 12px;">{{ warning.message }}</td>
+            </tr>
+            {% endif %}
+            {% endwith %}
         </table>
 
         <!-- Recommended Actions -->
