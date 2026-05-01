@@ -54,9 +54,9 @@ def dashboard(request):
 def view_hotels(request):
     query = request.GET.get('q', '')
     if query:
-        hotels = tbl_hotel.objects.filter(hotel_name__icontains=query)
+        hotels = tbl_hotel.objects.filter(hotel_name__icontains=query, is_verified=1)
     else:
-        hotels = tbl_hotel.objects.all()
+        hotels = tbl_hotel.objects.filter(is_verified=1)
     return render(request, 'Admin/ViewHotels.html', {'hotels': hotels, 'search_query': query})
 
 def add_hotel(request):
@@ -142,6 +142,7 @@ def admin_upload_image(request, hotel_id):
                 'is_video': is_video,
                 'status': status,
                 'violations': violations,
+                'labels': all_labels,
                 'hotel_id': hotel.id
             }
 

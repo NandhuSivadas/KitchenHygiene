@@ -71,6 +71,7 @@ def check_video_hygiene(video_path):
     dirty_frames = 0
     total_processed_frames = 0
     all_violations = set()
+    all_labels = set()
     
     count = 0
     while cap.isOpened():
@@ -88,6 +89,7 @@ def check_video_hygiene(video_path):
                     for box in result.boxes.data:
                         cls_id = int(box[5])
                         label = model.names[cls_id]
+                        all_labels.add(label)
                         if label in VIOLATIONS:
                             all_violations.add(label)
                             frame_has_violation = True
@@ -115,4 +117,4 @@ def check_video_hygiene(video_path):
         status = "Clean"
     
     print(f"🎥 Video Analysis: {dirty_frames}/{total_processed_frames} dirty frames. Status: {status}")
-    return status, list(all_violations), list(all_violations)
+    return status, list(all_labels), list(all_violations)

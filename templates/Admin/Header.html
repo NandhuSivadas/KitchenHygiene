@@ -53,7 +53,6 @@
             background-color: var(--text-main);
             color: var(--text-main);
             min-height: 100vh;
-            overflow-x: hidden;
             padding: 1.5rem;
             /* Premium radial gradient background */
             background-image: radial-gradient(circle at 50% 0%, #ffffff 0%, #f1f5f9 100%);
@@ -342,7 +341,7 @@
             box-shadow: var(--card-shadow);
             margin-bottom: 2rem;
             position: relative;
-            overflow: visible;
+            overflow: clip;  /* clips children without creating a scroll container */
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             /* Entrance */
             animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -626,6 +625,13 @@
             transition: all 0.3s ease;
             /* Table row entrance stagger trick can be forced in template loop, or just fade universally */
             animation: fadeInScale 0.6s ease forwards;
+        }
+
+        /* Responsive table container */
+        .custom-table-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         /* Utility classes */

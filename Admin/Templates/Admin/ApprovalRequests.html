@@ -59,7 +59,7 @@
                     <th>Contact</th>
                     <th>Address</th>
                     <th>Status</th>
-                    <th>Actions</th>
+                    <th style="text-align: right; min-width: 220px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -105,8 +105,8 @@
                             Pending
                         </span>
                     </td>
-                    <td>
-                        <div style="display: flex; gap: 8px;">
+                    <td style="white-space: nowrap; min-width: max-content;">
+                        <div style="display: flex; gap: 8px; justify-content: flex-end; min-width: max-content;">
                             <button onclick="showApproveModal('{{ hotel.id }}', '{{ hotel.hotel_name }}')"
                                 class="btn-modern-success btn-sm px-3 py-2">
                                 <i class="fas fa-check"></i> Approve
@@ -218,6 +218,25 @@
 </div>
 
 <style>
+    /* Fix: make each section card clip its overflow so the table container
+       can scroll horizontally inside the card instead of overflowing the page */
+    #pending-section,
+    #all-hotels-section {
+        overflow: hidden !important;
+    }
+
+    .custom-table-container {
+        overflow-x: auto;
+        width: 100%;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Ensure the table is never narrower than it needs to be */
+    #pending-section .custom-table,
+    #all-hotels-section .custom-table {
+        min-width: 900px;
+    }
+
     .section-title {
         font-size: 1.25rem;
         font-weight: 700;

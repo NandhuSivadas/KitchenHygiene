@@ -59,7 +59,7 @@
                     <th>Contact</th>
                     <th>Address</th>
                     <th>Status</th>
-                    <th style="width: 220px; text-align: center;">Actions</th>
+                    <th style="text-align: right; min-width: 220px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -105,14 +105,14 @@
                             Pending
                         </span>
                     </td>
-                    <td>
-                        <div style="display: flex; gap: 8px; justify-content: center; width: 100%;">
+                    <td style="white-space: nowrap;">
+                        <div style="display: flex; gap: 8px; justify-content: flex-end;">
                             <button onclick="showApproveModal('{{ hotel.id }}', '{{ hotel.hotel_name }}')"
-                                class="btn-modern-success btn-sm px-2 py-2" style="white-space: nowrap; flex: 1;">
+                                class="btn-modern-success btn-sm px-3 py-2">
                                 <i class="fas fa-check"></i> Approve
                             </button>
                             <button onclick="showRejectModal('{{ hotel.id }}', '{{ hotel.hotel_name }}')"
-                                class="btn-modern-danger btn-sm px-2 py-2" style="white-space: nowrap; flex: 1;">
+                                class="btn-modern-danger btn-sm px-3 py-2">
                                 <i class="fas fa-times"></i> Reject
                             </button>
                         </div>
@@ -218,6 +218,21 @@
 </div>
 
 <style>
+    /* Fix overflow: clip table inside its card, scroll within container */
+    #pending-section {
+        overflow: hidden !important;
+    }
+
+    .custom-table-container {
+        overflow-x: auto;
+        width: 100%;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #pending-section .custom-table {
+        min-width: 860px;
+    }
+
     .section-title {
         font-size: 1.25rem;
         font-weight: 700;
