@@ -434,9 +434,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     violationsHtml += `<li>No specific violations listed</li>`;
                 }
                 violationsHtml += `</ul>`;
+                if (data.labels && data.labels.length > 0) {
+                    violationsHtml += `<h6 class="fw-bold small text-uppercase text-muted mb-2">All Detections:</h6><p class="text-muted small mb-4">${data.labels.join(', ')}</p>`;
+                }
                 violationsHtml += `<button type="button" class="btn btn-danger w-100 rounded-pill py-3 fw-bold shadow" id="modalWarningBtn" data-hotel-id="${data.hotel_id}"><i class="fas fa-envelope me-2"></i>Issue Warning & Send Report</button>`;
             } else {
-                violationsHtml = `<a href="/Admin/generate_certificate/${data.hotel_id}/" class="btn btn-success w-100 rounded-pill py-3 fw-bold"><i class="fas fa-certificate me-2"></i>Generate Official Certificate</a>`;
+                if (data.labels && data.labels.length > 0) {
+                    violationsHtml += `<h6 class="fw-bold small text-uppercase text-muted mb-2">Detections:</h6><p class="text-muted small mb-4">${data.labels.join(', ')}</p>`;
+                }
+                violationsHtml += `<a href="/Admin/generate_certificate/${data.hotel_id}/" class="btn btn-success w-100 rounded-pill py-3 fw-bold"><i class="fas fa-certificate me-2"></i>Generate Official Certificate</a>`;
             }
 
             modalBody.innerHTML = `
